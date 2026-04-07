@@ -3,160 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>名古屋旅程 v6.2 旗艦管理者</title>
+    <title>名古屋旅程 v6.3 旗艦版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --n-gold: #E6B422; --n-miso: #8D6E63; --n-paper: #FDFBF7; }
-        /* 1. 強制所有文字不小於 14px */
+        /* 強制所有文字不小於 14px */
         body { font-size: 16px; font-family: 'Noto Sans TC', sans-serif; background-color: var(--n-paper); color: #1F2937; text-align: left; }
-        p, span, div, input, button { font-size: 14px; }
+        p, span, div, input, button, label { font-size: 14px; }
         h1 { font-size: 28px !important; }
         h2 { font-size: 20px !important; }
         h3 { font-size: 18px !important; }
 
-        .card { background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 15px; overflow: hidden; border: 1px solid rgba(230,180,34,0.1); }
+        .card { background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 12px; overflow: hidden; border: 1px solid rgba(230,180,34,0.15); }
         .gold-border { border-top: 6px solid var(--n-gold); }
         
-        .weather-card { background: rgba(226, 232, 240, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 20px; }
-        .weather-scroll { display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none; }
-        .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.8); padding: 15px 5px; border-radius: 20px; }
+        .weather-card { background: rgba(226, 232, 240, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 24px; padding: 15px; margin-bottom: 15px; }
+        .weather-scroll { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
+        .weather-item { flex: 0 0 calc(33.33% - 6px); text-align: center; background: rgba(255,255,255,0.8); padding: 12px 5px; border-radius: 18px; }
 
-        .muji-btn { background: linear-gradient(135deg, var(--n-miso) 0%, #6D4C41 100%); color: white; padding: 16px; border-radius: 18px; font-weight: 700; text-align: center; cursor: pointer; display: block; border: none; font-size: 16px; width: 100%; }
+        .muji-btn { background: linear-gradient(135deg, var(--n-miso) 0%, #6D4C41 100%); color: white; padding: 16px; border-radius: 18px; font-weight: 700; text-align: center; cursor: pointer; display: block; border: none; width: 100%; }
         
         .page { display: none; padding-bottom: 120px; }
         .page.active { display: block; }
         
         .nav-active { color: var(--n-miso) !important; font-weight: 900 !important; }
-        .drive-line { border-left: 3px dashed #CBD5E1; margin-left: 30px; padding: 20px 0 20px 25px; position: relative; }
+        .drive-line { border-left: 3px dashed #CBD5E1; margin-left: 30px; padding: 10px 0 10px 25px; position: relative; }
         .drive-line::before { content: "\f1b9"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: -11px; top: 50%; transform: translateY(-50%); background: var(--n-paper); color: #CBD5E1; padding: 4px 0; }
         
-        input, select, textarea { width: 100%; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; margin-bottom: 12px; outline: none; font-size: 16px !important; background: #fff; }
-        .admin-badge { background: var(--n-gold); color: #5D4037; font-size: 12px; font-weight: 900; padding: 2px 8px; border-radius: 8px; }
+        input, select, textarea { width: 100%; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; margin-bottom: 10px; outline: none; font-size: 16px !important; background: #fff; }
     </style>
 </head>
 <body class="max-w-md mx-auto min-h-screen relative">
 
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
 
-    <header class="p-6 pt-10 flex justify-between items-center">
+    <header class="p-6 pt-10 flex justify-between items-center text-left">
         <div>
-            <div class="flex items-center gap-2">
-                <h1 class="font-black">名古屋旅程</h1>
-                <span class="admin-badge">ADMIN</span>
-            </div>
-            <p id="syncStatus" class="text-gray-400 font-bold mt-1">手動更新模式</p>
+            <h1 class="font-black text-gray-800">名古屋旅程</h1>
+            <p id="syncStatus" class="text-gray-400 font-bold">手動更新模式 (v6.3)</p>
         </div>
-        <button onclick="pullData()" class="text-stone-300 text-3xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+        <button onclick="pullData()" class="text-stone-300 text-3xl p-2 active:rotate-180 transition-all duration-500"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
     <main class="px-5">
         <div id="page-itinerary" class="page active">
-            <div onclick="openFlightModal()" class="card p-6 gold-border active:scale-95 transition-all">
-                <div class="flex justify-between items-center mb-4">
+            <div onclick="openFlightModal()" class="card p-5 gold-border active:scale-95 transition-all text-left">
+                <div class="flex justify-between items-center mb-3">
                     <h2 id="f-airline" class="font-black text-gray-700">航空公司</h2>
                     <i class="fa-solid fa-chevron-right text-stone-300"></i>
                 </div>
-                <div class="space-y-4">
-                    <div>
-                        <p class="text-blue-500 font-black tracking-widest text-[12px] mb-1">去程 DEPARTURE</p>
-                        <p id="f-dep-info" class="font-bold text-gray-600 text-lg">載入中...</p>
+                <div class="space-y-2">
+                    <div class="flex items-center">
+                        <span class="text-blue-500 font-black mr-2 uppercase text-[12px]">去程</span>
+                        <span id="f-dep-line" class="font-bold text-gray-600 text-[15px]">載入中...</span>
                     </div>
-                    <div>
-                        <p class="text-red-500 font-black tracking-widest text-[12px] mb-1">回程 RETURN</p>
-                        <p id="f-arr-info" class="font-bold text-gray-600 text-lg">載入中...</p>
+                    <div class="flex items-center">
+                        <span class="text-red-500 font-black mr-2 uppercase text-[12px]">回程</span>
+                        <span id="f-arr-line" class="font-bold text-gray-600 text-[15px]">載入中...</span>
                     </div>
                 </div>
             </div>
 
             <div class="weather-card">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="font-black text-gray-500 uppercase">6H Forecast</span>
-                    <button onclick="updateWeather()" class="bg-white/80 px-4 py-1 rounded-full font-bold">更新數據</button>
+                <div class="flex justify-between items-center mb-3 text-left">
+                    <span class="font-black text-gray-500 uppercase tracking-tighter">6H Forecast (Nagoya)</span>
+                    <button onclick="updateWeather()" class="bg-white/80 px-3 py-1 rounded-full font-bold">更新</button>
                 </div>
                 <div id="weatherContainer" class="weather-scroll"></div>
             </div>
 
-            <button onclick="openAddItinerary()" class="muji-btn mb-6 shadow-xl"><i class="fa-solid fa-plus-circle mr-2"></i>新增行程</button>
-            <div id="itineraryList" class="space-y-2"></div>
+            <button onclick="openAddItinerary()" class="muji-btn mb-6 shadow-lg">＋ 新增行程</button>
+            <div id="itineraryList" class="space-y-0"></div>
         </div>
 
-        <div id="page-items" class="page">
+        <div id="page-items" class="page text-left">
             <h2 class="font-black mb-6">物品清單</h2>
-            <div class="card p-6 border-t-4 border-blue-400 mb-6">
-                <h3 class="font-black text-blue-500 mb-4">要攜帶的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="帶什麼？"><button onclick="addItem('bring')" class="muji-btn w-auto px-6 bg-blue-500 shadow-none">+</button></div>
-                <ul id="bringList" class="divide-y divide-gray-100"></ul>
+            <div class="card p-5 border-t-4 border-blue-400 mb-5">
+                <h3 class="font-black text-blue-500 mb-3">要攜帶的物品</h3>
+                <div class="flex gap-2 mb-3"><input id="bringInput" type="text" placeholder="帶什麼？"><button onclick="addItem('bring')" class="muji-btn w-auto px-5 bg-blue-500 shadow-none">＋</button></div>
+                <ul id="bringList" class="divide-y divide-gray-50"></ul>
             </div>
-            <div class="card p-6 border-t-4 border-red-400">
-                <h3 class="font-black text-red-500 mb-4">要購買的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="買什麼？"><button onclick="addItem('buy')" class="muji-btn w-auto px-6 bg-red-500 shadow-none">+</button></div>
-                <ul id="buyList" class="divide-y divide-gray-100"></ul>
+            <div class="card p-5 border-t-4 border-red-400">
+                <h3 class="font-black text-red-500 mb-3">要購買的物品</h3>
+                <div class="flex gap-2 mb-3"><input id="buyInput" type="text" placeholder="買什麼？"><button onclick="addItem('buy')" class="muji-btn w-auto px-5 bg-red-500 shadow-none">＋</button></div>
+                <ul id="buyList" class="divide-y divide-gray-50"></ul>
             </div>
         </div>
 
-        <div id="page-budget" class="page">
-            <div class="card p-8 bg-stone-800 text-white text-center mb-6">
-                <p class="font-black opacity-50 uppercase">Trip Expenses</p>
-                <div class="text-4xl font-black mt-2">¥ <span id="totalSpend">0</span></div>
-                <p class="text-lg opacity-60 font-bold mt-1">≈ NT$ <span id="totalTWD">0</span></p>
+        <div id="page-budget" class="page text-left">
+            <div class="card p-8 bg-stone-800 text-white text-center mb-5">
+                <div class="text-4xl font-black">¥ <span id="totalSpend">0</span></div>
+                <p class="text-lg opacity-50 font-bold mt-1">≈ NT$ <span id="totalTWD">0</span></p>
             </div>
-            <div id="payerStats" class="grid grid-cols-2 gap-3 mb-6"></div>
-            <div class="card p-6">
+            <div id="payerStats" class="grid grid-cols-3 gap-2 mb-6 text-center"></div>
+            
+            <div class="card p-5">
                 <input id="expName" type="text" placeholder="項目">
-                <div class="relative"><input id="expCost" type="number" placeholder="金額 (JPY)" oninput="calcTWD(this.value)"><div id="quickTWD" class="absolute right-4 top-4 font-bold text-stone-400">≈ NT$ 0</div></div>
+                <div class="relative"><input id="expCost" type="number" placeholder="金額 (JPY)" oninput="calcTWD(this.value)"><div id="quickTWD" class="absolute right-4 top-4 font-bold text-stone-300">≈ NT$ 0</div></div>
                 <select id="expPayer"></select>
                 <button onclick="addExp()" class="muji-btn mt-2">儲存紀錄</button>
             </div>
-            <div id="expList" class="space-y-4 mt-6"></div>
+            <div id="expList" class="space-y-3 mt-6"></div>
         </div>
 
-        <div id="page-tools" class="page">
+        <div id="page-tools" class="page text-left">
             <h2 class="font-black mb-6">系統設定</h2>
             <div class="card p-6">
                 <h3 class="font-bold text-gray-400 uppercase mb-4">名單管理</h3>
                 <div class="flex gap-2 mb-4"><input id="newPayer" type="text" placeholder="姓名"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div>
                 <div id="payerManagerList" class="flex flex-wrap gap-2 mb-6"></div>
                 <hr class="my-6">
-                <label class="font-black text-gray-500 uppercase">當前匯率</label>
+                <label class="font-black text-gray-500">匯率設定 (1 JPY = ? TWD)</label>
                 <input id="exRate" type="number" step="0.001" value="0.21" onchange="saveSettingsOnly()">
-                <hr class="my-6">
+                <hr class="my-8">
                 <button onclick="resetToDefault()" class="w-full py-5 bg-red-50 text-red-600 rounded-2xl font-black text-lg mb-4 border-2 border-red-100">恢復 7 天行程備份</button>
-                <button onclick="clearAllData()" class="w-full text-stone-300 font-bold">清空雲端資料</button>
             </div>
         </div>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-amber-50 flex justify-around py-4 pb-10 z-50">
-        <button onclick="switchPage('itinerary')" id="nav-itinerary" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-route text-2xl"></i><span class="mt-1 font-bold">行程</span></button>
-        <button onclick="switchPage('items')" id="nav-items" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-toolbox text-2xl"></i><span class="mt-1 font-bold">清單</span></button>
-        <button onclick="switchPage('budget')" id="nav-budget" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-wallet text-2xl"></i><span class="mt-1 font-bold">記帳</span></button>
-        <button onclick="switchPage('tools')" id="nav-tools" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-crown text-2xl"></i><span class="mt-1 font-bold">設定</span></button>
+        <button onclick="switchPage('itinerary')" id="nav-itinerary" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-map-location-dot text-2xl"></i><span class="mt-1 font-bold">行程</span></button>
+        <button onclick="switchPage('items')" id="nav-items" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-list-check text-2xl"></i><span class="mt-1 font-bold">清單</span></button>
+        <button onclick="switchPage('budget')" id="nav-budget" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-coins text-2xl"></i><span class="mt-1 font-bold">記帳</span></button>
+        <button onclick="switchPage('tools')" id="nav-tools" class="flex flex-col items-center text-stone-300"><i class="fa-solid fa-user-gear text-2xl"></i><span class="mt-1 font-bold">設定</span></button>
     </nav>
 
-    <div id="flightModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-md">
+    <div id="flightModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-md text-left">
         <div class="card w-full p-6 h-[85vh] overflow-y-auto border-t-8 border-amber-400">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-black text-2xl">航班詳情</h3>
+                <h3 class="font-black text-2xl">航班資訊</h3>
                 <button onclick="closeModal('flightModal')" class="text-stone-300 text-4xl">×</button>
             </div>
-            <div class="bg-stone-50 p-5 rounded-3xl mb-6 border border-gray-100">
-                <div class="flex justify-between items-center mb-4">
-                    <p class="font-black text-amber-600 uppercase">Master Schedule</p>
-                    <button onclick="editMainFlightSchedule()" class="text-blue-500 font-bold bg-blue-50 px-4 py-1 rounded-full">修改</button>
+            <div class="bg-stone-50 p-4 rounded-2xl mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <p class="font-black text-amber-600 uppercase text-[12px]">Schedule</p>
+                    <button onclick="editMainFlightSchedule()" class="text-blue-500 font-bold text-sm">修改</button>
                 </div>
-                <div class="space-y-1" id="m-summary-box">載入中...</div>
+                <p class="font-black text-gray-800 mb-1" id="m-summary-airline"></p>
+                <p class="text-gray-600 font-medium" id="m-summary-dep"></p>
+                <p class="text-gray-600 font-medium" id="m-summary-arr"></p>
             </div>
-            <p class="font-black text-gray-400 mb-4 uppercase tracking-widest">Passenger List (5)</p>
+            <p class="font-black text-gray-400 mb-3 uppercase tracking-widest text-[12px]">Passenger List (5)</p>
             <div id="psgrCardList" class="space-y-3"></div>
+            <div class="mt-8"><button onclick="closeModal('flightModal')" class="muji-btn opacity-40">返回行程</button></div>
         </div>
     </div>
 
-    <div id="mainFlightEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400]">
-        <div class="card w-full p-6">
+    <div id="mainFlightEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400] text-left">
+        <div class="card w-full p-6 h-[85vh] overflow-y-auto">
             <h3 class="font-black mb-4">編輯航班總覽</h3>
-            <label class="text-gray-400 font-bold">航空公司</label><input id="edit-airline" type="text">
+            <label>航空公司</label><input id="edit-airline" type="text">
             <div class="grid grid-cols-2 gap-2"><div><label>去程日期</label><input id="edit-dep-date" type="text"></div><div><label>去程航班</label><input id="edit-dep-no" type="text"></div></div>
             <div class="grid grid-cols-2 gap-2"><div><label>起飛(機場)</label><input id="edit-dep-from" type="text"></div><div><label>降落(機場)</label><input id="edit-dep-to" type="text"></div></div>
             <div class="grid grid-cols-2 gap-2"><div><label>起飛時間</label><input id="edit-dep-time" type="time"></div><div><label>抵達時間</label><input id="edit-dep-arr" type="time"></div></div>
@@ -164,56 +162,56 @@
             <div class="grid grid-cols-2 gap-2"><div><label>回程日期</label><input id="edit-arr-date" type="text"></div><div><label>回程航班</label><input id="edit-arr-no" type="text"></div></div>
             <div class="grid grid-cols-2 gap-2"><div><label>起飛(機場)</label><input id="edit-arr-from" type="text"></div><div><label>降落(機場)</label><input id="edit-arr-to" type="text"></div></div>
             <div class="grid grid-cols-2 gap-2"><div><label>起飛時間</label><input id="edit-arr-time" type="time"></div><div><label>抵達時間</label><input id="edit-arr-arr" type="time"></div></div>
-            <button onclick="saveMainFlightSchedule()" class="muji-btn mt-4">儲存航班</button>
+            <button onclick="saveMainFlightSchedule()" class="muji-btn mt-4">儲存主航班</button>
         </div>
     </div>
 
-    <div id="psgrEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400]">
+    <div id="psgrEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400] text-left">
         <div class="card w-full p-6 h-[80vh] overflow-y-auto">
-            <h3 class="font-black mb-6 text-2xl">旅客詳細資料</h3>
-            <label>旅客姓名</label><input id="psgr-name" type="text">
-            <div class="p-5 bg-blue-50 rounded-3xl mb-5">
-                <p class="font-black text-blue-600 mb-3 uppercase tracking-widest">去程 (Outbound)</p>
+            <h3 class="font-black mb-6 text-2xl">編輯旅客</h3>
+            <label>姓名</label><input id="psgr-name" type="text">
+            <div class="p-4 bg-blue-50 rounded-2xl mb-4 border border-blue-100">
+                <p class="font-black text-blue-600 mb-3 text-[12px] uppercase tracking-widest">去程 (Outbound)</p>
                 <label>訂位 PNR</label><input id="psgr-dep-pnr" type="text">
                 <label>座位</label><input id="psgr-dep-seat" type="text">
                 <label>餐點</label><input id="psgr-dep-meal" type="text">
             </div>
-            <div class="p-5 bg-red-50 rounded-3xl mb-5">
-                <p class="font-black text-red-600 mb-3 uppercase tracking-widest">回程 (Inbound)</p>
+            <div class="p-4 bg-red-50 rounded-2xl border border-red-100">
+                <p class="font-black text-red-600 mb-3 text-[12px] uppercase tracking-widest">回程 (Inbound)</p>
                 <label>訂位 PNR</label><input id="psgr-arr-pnr" type="text">
                 <label>座位</label><input id="psgr-arr-seat" type="text">
                 <label>餐點</label><input id="psgr-arr-meal" type="text">
             </div>
-            <button onclick="savePassengerDetails()" class="muji-btn">確定儲存</button>
+            <button onclick="savePassengerDetails()" class="muji-btn mt-6">確認修改</button>
         </div>
     </div>
 
-    <div id="viewModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[200] backdrop-blur-md">
+    <div id="viewModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[200] backdrop-blur-md text-left">
         <div class="card w-full p-8 relative flex flex-col min-h-[60vh]">
             <button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-stone-300 text-4xl">×</button>
             <div id="viewContent" class="flex-grow"></div>
             <div class="mt-8 space-y-4">
-                <button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-2xl shadow-xl active:scale-95">導航</button>
+                <button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-2xl shadow-xl active:scale-95"><i class="fa-solid fa-map-location-dot mr-2"></i> 導航</button>
                 <div class="grid grid-cols-2 gap-4">
                     <button id="viewEditBtn" class="py-5 bg-stone-100 rounded-2xl font-bold text-stone-600">編輯</button>
                     <button id="viewAiBtn" class="py-5 bg-stone-100 rounded-2xl font-bold text-stone-600">問 AI</button>
                 </div>
-                <div class="pt-10 border-t border-gray-50 flex justify-center"><button id="viewDelBtn" class="text-red-400 font-bold text-lg p-4">刪除此行程</button></div>
+                <div class="pt-8 border-t border-gray-50 flex justify-center"><button id="viewDelBtn" class="text-red-400 font-bold text-lg p-4 opacity-50">刪除行程</button></div>
             </div>
         </div>
     </div>
 
-    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300]">
+    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] text-left">
         <div class="card w-full p-6 h-[85vh] overflow-y-auto">
-            <h3 class="font-black mb-6">編輯行程</h3>
+            <h3 id="itTitle" class="font-black mb-6">編輯行程</h3>
             <input type="hidden" id="itIdx">
             <div class="grid grid-cols-2 gap-4">
                 <div><label>日期 (05/23)</label><input id="itDate" type="text"></div>
                 <div><label>時間 (24H)</label><input id="itTime" type="time"></div>
             </div>
             <label>標題</label><input id="itHeading" type="text">
-            <label>地址</label><input id="itLoc" type="text">
-            <label>路程銜接</label><input id="itDrive" type="text">
+            <label>地址/停車場</label><input id="itLoc" type="text">
+            <label>路程銜接 (例如: 開車 40min)</label><input id="itDrive" type="text">
             <label>備註</label><textarea id="itNote" class="h-40"></textarea>
             <button onclick="saveItinerary()" class="muji-btn">儲存修改</button>
         </div>
@@ -222,22 +220,8 @@
     <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full opacity-0 transition-opacity z-[9999] pointer-events-none border border-amber-400 shadow-2xl"></div>
 
     <script>
-        // --- 核心邏輯：保證分頁絕對穩定 ---
-        function switchPage(p) {
-            const pages = document.querySelectorAll('.page');
-            const btns = document.querySelectorAll('nav button');
-            pages.forEach(el => el.classList.remove('active'));
-            btns.forEach(el => el.classList.remove('nav-active'));
-            
-            const targetPage = document.getElementById('page-' + p);
-            const targetBtn = document.getElementById('nav-' + p);
-            if(targetPage) targetPage.classList.add('active');
-            if(targetBtn) targetBtn.classList.add('nav-active');
-            window.scrollTo(0,0);
-        }
-
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
-        const DB_KEY = 'vina_travel_v6_final';
+        const DB_KEY = 'vina_travel_v6_3_local';
 
         const masterData = {
             flightMain: { 
@@ -246,21 +230,21 @@
                 arrDate: "05/29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30", arrFrom: "NGO", arrTo: "TPE"
             },
             passengers: [
-                { name: "薇那(Admin)", dep: { pnr: "ABCDEF", seat: "22A", meal: "一般餐" }, ret: { pnr: "ABCDEF", seat: "22A", meal: "一般餐" } },
-                { name: "大人 B", dep: { pnr: "ABCDEF", seat: "22B", meal: "一般餐" }, ret: { pnr: "ABCDEF", seat: "22B", meal: "一般餐" } },
-                { name: "大人 C", dep: { pnr: "ABCDEF", seat: "22C", meal: "一般餐" }, ret: { pnr: "ABCDEF", seat: "22C", meal: "一般餐" } },
-                { name: "小孩 1", dep: { pnr: "ABCDEF", seat: "21A", meal: "兒童餐" }, ret: { pnr: "ABCDEF", seat: "21A", meal: "兒童餐" } },
-                { name: "小孩 2", dep: { pnr: "ABCDEF", seat: "21B", meal: "兒童餐" }, ret: { pnr: "ABCDEF", seat: "21B", meal: "兒童餐" } }
+                { name: "薇那(Admin)", dep: { pnr: "VINA88", seat: "22A", meal: "一般餐" }, ret: { pnr: "VINA88", seat: "22A", meal: "一般餐" } },
+                { name: "大人 B", dep: { pnr: "PNR123", seat: "22B", meal: "一般餐" }, ret: { pnr: "PNR123", seat: "22B", meal: "一般餐" } },
+                { name: "大人 C", dep: { pnr: "PNR456", seat: "22C", meal: "一般餐" }, ret: { pnr: "PNR456", seat: "22C", meal: "一般餐" } },
+                { name: "小孩 1", dep: { pnr: "KID01", seat: "21A", meal: "兒童餐" }, ret: { pnr: "KID01", seat: "21A", meal: "兒童餐" } },
+                { name: "小孩 2", dep: { pnr: "KID02", seat: "21B", meal: "兒童餐" }, ret: { pnr: "KID02", seat: "21B", meal: "兒童餐" } }
             ],
             itinerary: [
-                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場(NGO)", driveInfo: "開車 45min", note: "辦理取車手續。檢查：日文譯本、駕照、小孩增高墊。" },
-                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", driveInfo: "", note: "晚餐：矢場丼味噌豬排。這區很多 Times 停車場。" },
-                { date: "05/24", time: "11:00", title: "樂高樂園", location: "LEGOLAND Japan", driveInfo: "", note: "小孩放電時間。門口有 Maker's Pier 餐廳區。" },
-                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV Park", driveInfo: "", note: "室內吹冷氣，看超大模型。" },
-                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "長島度假村", driveInfo: "開車 40min", note: "導航至長島度假村。有造型麵包可以買。" },
-                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "名古屋港水族館", driveInfo: "", note: "看虎鯨表演。全室內。" },
+                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場(NGO)", driveInfo: "開車 45min", note: "辦理取車手續。檢查：日文譯本、駕照。" },
+                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", driveInfo: "", note: "吃味噌豬排！這區很多 Times 停車場。" },
+                { date: "05/24", time: "11:00", title: "樂高樂園", location: "LEGOLAND Japan", driveInfo: "", note: "全家出動，小孩放電日。" },
+                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV Park", driveInfo: "", note: "室內看火車模型。" },
+                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "長島度假村", driveInfo: "開車 40min", note: "小孩最愛。" },
+                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "名古屋港水族館", driveInfo: "", note: "看虎鯨表演。" },
                 { date: "05/28", time: "11:00", title: "豐田技術館", location: "トヨタ産業技術記念館", driveInfo: "", note: "室內親子設施。" },
-                { date: "05/29", time: "11:00", title: "早餐 & 機場還車", location: "中部國際機場(還車)", driveInfo: "開車 45min", note: "14:30 需回到機場報到。" }
+                { date: "05/29", time: "11:00", title: "回程 & 還車報到", location: "中部國際機場", driveInfo: "", note: "14:30 需報到。" }
             ],
             checkBring: [{text:"護照", done:false},{text:"譯本", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
         };
@@ -268,30 +252,35 @@
         let db = JSON.parse(JSON.stringify(masterData));
         let activePsgrIdx = -1;
 
-        // --- 同步與存儲 ---
+        // --- 核心邏輯：分頁切換 ---
+        function switchPage(p) {
+            const pages = document.querySelectorAll('.page');
+            const btns = document.querySelectorAll('nav button');
+            pages.forEach(el => el.classList.remove('active'));
+            btns.forEach(el => el.classList.remove('nav-active'));
+            const targetPage = document.getElementById('page-' + p);
+            const targetBtn = document.getElementById('nav-' + p);
+            if(targetPage) targetPage.classList.add('active');
+            if(targetBtn) targetBtn.classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+
+        // --- 同步 ---
         function init() {
             const local = localStorage.getItem(DB_KEY);
             if (local) { db = JSON.parse(local); }
-            renderAll();
-            updateWeather();
+            renderAll(); updateWeather();
         }
-
         async function pullData() {
             showSync(true);
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
-                if(data && data.itinerary) { db = data; saveLocal(); toast("雲端同步成功"); }
-            } catch (e) { toast("同步失敗，請稍後再試"); }
+                if(data && data.itinerary) { db = data; saveLocal(); toast("🏮 雲端同步完成"); }
+            } catch (e) { toast("同步失敗，使用本機資料"); }
             renderAll(); showSync(false);
         }
-
-        async function pushData() {
-            showSync(true); saveLocal();
-            try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){}
-            renderAll(); showSync(false);
-        }
-
+        async function pushData() { showSync(true); saveLocal(); try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} showSync(false); }
         function saveLocal() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
         function saveSettingsOnly() { db.rate = parseFloat(document.getElementById('exRate').value); saveLocal(); renderAll(); }
 
@@ -299,23 +288,22 @@
         function renderAll() {
             const f = db.flightMain;
             document.getElementById('f-airline').innerText = f.airline;
-            document.getElementById('f-dep-info').innerText = f.depDate + " " + f.depNo + " " + f.depTime + "-" + f.depArrTime + " (" + f.depFrom + "→" + f.depTo + ")";
-            document.getElementById('f-arr-info').innerText = f.arrDate + " " + f.arrNo + " " + f.arrTime + "-" + f.arrArrTime + " (" + f.arrFrom + "→" + f.arrTo + ")";
+            document.getElementById('f-dep-line').innerText = f.depDate + ' ' + f.depNo + ' ' + f.depTime + '-' + f.depArrTime + ' (' + f.depFrom + '→' + f.depTo + ')';
+            document.getElementById('f-arr-line').innerText = f.arrDate + ' ' + f.arrNo + ' ' + f.arrTime + '-' + f.arrArrTime + ' (' + f.arrFrom + '→' + f.arrTo + ')';
 
-            const itList = document.getElementById('itineraryList');
-            itList.innerHTML = '';
+            const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
             db.itinerary.forEach((it, idx) => {
-                itList.innerHTML += '<div onclick="viewDetail(' + idx + ')" class="card p-6 border-l-[8px] border-amber-400 active:scale-98 transition-all">' +
+                itList.innerHTML += '<div onclick="viewDetail(' + idx + ')" class="card p-6 border-l-[8px] border-amber-400 active:scale-98 transition-all text-left">' +
                     '<span class="font-black text-stone-400 uppercase tracking-widest">' + it.date + ' ' + it.time + '</span>' +
                     '<h3 class="font-black text-gray-800 mt-2">' + it.title + '</h3>' +
                     '<p class="text-blue-500 font-bold mt-2 truncate"><i class="fa-solid fa-location-dot mr-1"></i> ' + it.location + '</p>' +
                 '</div>';
                 if(it.driveInfo && idx < db.itinerary.length - 1) {
-                    itList.innerHTML += '<div class="drive-line"><span class="bg-white text-blue-600 font-black px-4 py-2 rounded-full border border-blue-100 shadow-sm">' + it.driveInfo + '</span></div>';
+                    itList.innerHTML += '<div class="drive-line"><span class="bg-white text-blue-600 font-black px-4 py-1.5 rounded-full border border-blue-50 shadow-sm">' + it.driveInfo + '</span></div>';
                 }
             });
 
-            // 記帳、設定、清單...
+            // 結算、記帳 (優化為橫向三列)
             const rate = db.rate || 0.21;
             document.getElementById('exRate').value = rate;
             let total = 0; const payerTotals = {};
@@ -323,33 +311,33 @@
             document.getElementById('expList').innerHTML = db.expenses.slice().reverse().map((e, idx) => {
                 total += e.cost; if(payerTotals.hasOwnProperty(e.payer)) payerTotals[e.payer] += e.cost;
                 const rIdx = db.expenses.length - 1 - idx;
-                return '<div class="card p-5 flex justify-between items-center text-left"><div><p class="font-black text-gray-700">' + e.name + '</p><p class="text-gray-400 font-bold uppercase">NT$ ' + Math.round(e.cost * rate).toLocaleString() + ' • ' + e.payer + '</p></div><div class="flex items-center gap-4"><span class="font-black text-2xl">¥' + e.cost.toLocaleString() + '</span><button onclick="delExp(' + rIdx + ')" class="text-stone-200 text-3xl">×</button></div></div>';
+                return '<div class="card p-4 flex justify-between items-center text-left"><div><p class="font-black text-gray-700">' + e.name + '</p><p class="text-gray-400 font-bold uppercase">NT$ ' + Math.round(e.cost * rate).toLocaleString() + ' • ' + e.payer + '</p></div><div class="flex items-center gap-3"><span class="font-black text-2xl">¥' + e.cost.toLocaleString() + '</span><button onclick="delExp(' + rIdx + ')" class="text-stone-200 text-3xl">×</button></div></div>';
             }).join('');
             document.getElementById('totalSpend').innerText = total.toLocaleString();
             document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
-            document.getElementById('payerStats').innerHTML = Object.entries(payerTotals).map(([p, val]) => '<div class="bg-white p-4 rounded-3xl border border-amber-50 shadow-sm text-left"><p class="font-black text-gray-400 uppercase tracking-widest">' + p + '</p><p class="font-black text-xl text-amber-600">¥' + val.toLocaleString() + '</p></div>').join('');
+            document.getElementById('payerStats').innerHTML = Object.entries(payerTotals).map(([p, val]) => '<div class="bg-white p-3 rounded-2xl border border-amber-50 text-center"><p class="font-black text-gray-400 text-[12px] uppercase">' + p + '</p><p class="font-black text-[16px] text-amber-600">¥' + (val/1000).toFixed(1) + 'k</p></div>').join('');
+            
             document.getElementById('expPayer').innerHTML = db.payers.map(p => '<option value="' + p + '">' + p + '</option>').join('');
-            document.getElementById('payerManagerList').innerHTML = db.payers.map((p, idx) => '<div class="bg-stone-100 px-5 py-2 rounded-full font-bold flex items-center gap-3">' + p + ' <button onclick="delPayerName(' + idx + ')" class="text-stone-300">×</button></div>').join('');
+            document.getElementById('payerManagerList').innerHTML = db.payers.map((p, idx) => '<div class="bg-stone-100 px-4 py-2 rounded-full font-bold flex items-center gap-2">' + p + ' <button onclick="delPayerName(' + idx + ')" class="text-stone-300">×</button></div>').join('');
             renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
         }
 
-        // --- 功能模塊 ---
-        function viewDetail(idx) {
-            const it = db.itinerary[idx];
-            document.getElementById('viewContent').innerHTML = '<div class="text-left"><p class="font-black text-stone-300 uppercase mb-1">' + it.date + ' ' + it.time + '</p><h2 class="text-4xl font-black text-gray-800 leading-tight mb-4">' + it.title + '</h2><p class="text-blue-600 font-bold text-lg mb-6"><i class="fa-solid fa-location-dot"></i> ' + it.location + '</p><div class="bg-stone-50 p-6 rounded-3xl border border-gray-100 text-gray-600 leading-relaxed text-xl">' + (it.note ? it.note.replace(/\n/g, '<br>') : '無備註') + '</div></div>';
-            document.getElementById('viewMapBtn').onclick = () => window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(it.location), "_blank");
-            document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); };
-            document.getElementById('viewAiBtn').onclick = () => window.open("https://www.google.com/search?q=" + encodeURIComponent(it.location + " 附近親子美食"), "_blank");
-            document.getElementById('viewDelBtn').onclick = async () => { if(confirm("確定刪除？")) { db.itinerary.splice(idx, 1); await pushData(); closeModal('viewModal'); } };
-            openModal('viewModal');
-        }
+        // --- 航班處理 (優化旅客卡片) ---
         function openFlightModal() {
             const f = db.flightMain;
-            document.getElementById('m-summary-box').innerHTML = '<p class="font-black text-gray-800">' + f.airline + '</p><p class="text-gray-600">去：' + f.depDate + ' ' + f.depNo + ' (' + f.depFrom + '→' + f.depTo + ')</p><p class="text-gray-600">回：' + f.arrDate + ' ' + f.arrNo + ' (' + f.arrFrom + '→' + f.arrTo + ')</p>';
+            document.getElementById('m-summary-airline').innerText = f.airline;
+            document.getElementById('m-summary-dep').innerText = '去：' + f.depDate + ' ' + f.depNo + ' (' + f.depFrom + '→' + f.depTo + ')';
+            document.getElementById('m-summary-arr').innerText = '回：' + f.arrDate + ' ' + f.arrNo + ' (' + f.arrFrom + '→' + f.arrTo + ')';
             renderPassengerCards(); openModal('flightModal');
         }
         function renderPassengerCards() {
-            document.getElementById('psgrCardList').innerHTML = db.passengers.map((p, idx) => '<div onclick="openPsgrEdit(' + idx + ')" class="bg-white p-5 rounded-3xl border border-gray-100 flex justify-between items-center active:bg-amber-50 shadow-sm"><div><p class="font-black text-xl text-gray-800">' + p.name + '</p><p class="text-gray-400 font-bold uppercase mt-1">去: ' + p.dep.seat + ' | 回: ' + p.ret.seat + '</p></div><i class="fa-solid fa-chevron-right text-stone-200"></i></div>').join('');
+            document.getElementById('psgrCardList').innerHTML = db.passengers.map((p, idx) => '<div onclick="openPsgrEdit(' + idx + ')" class="card p-5 border border-stone-100 active:bg-amber-50 text-left transition-all">' +
+                '<p class="font-black text-xl text-amber-600 mb-2">' + p.name + '</p>' +
+                '<div class="grid grid-cols-1 gap-1">' +
+                    '<div class="flex justify-between text-gray-400 font-bold"><span>PNR: ' + p.dep.pnr + '</span><span>' + p.dep.meal + '</span></div>' +
+                    '<div class="flex gap-4 font-mono font-black text-gray-600"><span>去程座位: ' + p.dep.seat + '</span><span>回程座位: ' + p.ret.seat + '</span></div>' +
+                '</div>' +
+            '</div>').join('');
         }
         function openPsgrEdit(idx) {
             activePsgrIdx = idx; const p = db.passengers[idx];
@@ -363,6 +351,30 @@
             db.passengers[idx] = { name: document.getElementById('psgr-name').value, dep: { pnr: document.getElementById('psgr-dep-pnr').value, seat: document.getElementById('psgr-dep-seat').value, meal: document.getElementById('psgr-dep-meal').value }, ret: { pnr: document.getElementById('psgr-arr-pnr').value, seat: document.getElementById('psgr-arr-seat').value, meal: document.getElementById('psgr-arr-meal').value } };
             closeModal('psgrEditModal'); renderPassengerCards(); await pushData();
         }
+
+        // --- 氣象、行程、清單其餘功能 (維持 v6.2 高穩定性) ---
+        async function updateWeather() {
+            const container = document.getElementById('weatherContainer'); container.innerHTML = '<p class="opacity-40 py-2">Loading...</p>';
+            try {
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,precipitation_probability,weathercode&forecast_days=1");
+                const data = await res.json(); const now = new Date().getHours(); let html = '';
+                for(let i=0; i<6; i++){
+                    const idx = (now + i) % 24; const temp = Math.round(data.hourly.temperature_2m[idx]); const prob = data.hourly.precipitation_probability[idx]; const code = data.hourly.weathercode[idx];
+                    let icon = 'fa-cloud'; if(code === 0) icon = 'fa-sun text-amber-500'; else if(code <= 3) icon = 'fa-cloud-sun text-stone-400'; else if(code <= 67) icon = 'fa-cloud-showers-heavy text-blue-400';
+                    html += '<div class="weather-item"><p class="font-black opacity-30">' + idx + ':00</p><i class="fa-solid ' + icon + ' text-2xl my-2"></i><p class="font-black text-gray-700">' + temp + '°</p><p class="font-bold text-blue-400">' + prob + '%</p></div>';
+                }
+                container.innerHTML = html;
+            } catch(e) { container.innerHTML = 'Error'; }
+        }
+        function viewDetail(idx) {
+            const it = db.itinerary[idx];
+            document.getElementById('viewContent').innerHTML = '<div class="text-left"><p class="font-black text-stone-300 uppercase mb-1">' + it.date + ' ' + it.time + '</p><h2 class="text-4xl font-black text-gray-800 leading-tight mb-4">' + it.title + '</h2><p class="text-blue-600 font-bold text-lg mb-6"><i class="fa-solid fa-location-dot"></i> ' + it.location + '</p><div class="bg-stone-50 p-6 rounded-3xl border border-gray-100 text-gray-600 leading-relaxed text-xl">' + (it.note ? it.note.replace(/\n/g, '<br>') : '無備註') + '</div></div>';
+            document.getElementById('viewMapBtn').onclick = () => window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(it.location), "_blank");
+            document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); };
+            document.getElementById('viewAiBtn').onclick = () => window.open("https://www.google.com/search?q=" + encodeURIComponent(it.location + " 附近親子美食"), "_blank");
+            document.getElementById('viewDelBtn').onclick = async () => { if(confirm("確定刪除？")) { db.itinerary.splice(idx, 1); await pushData(); closeModal('viewModal'); } };
+            openModal('viewModal');
+        }
         function editMainFlightSchedule() {
             const f = db.flightMain;
             document.getElementById('edit-airline').value = f.airline; document.getElementById('edit-dep-date').value = f.depDate; document.getElementById('edit-dep-no').value = f.depNo; document.getElementById('edit-dep-from').value = f.depFrom; document.getElementById('edit-dep-to').value = f.depTo; document.getElementById('edit-dep-time').value = f.depTime; document.getElementById('edit-dep-arr').value = f.depArrTime;
@@ -373,31 +385,16 @@
             db.flightMain = { airline: document.getElementById('edit-airline').value, depDate: document.getElementById('edit-dep-date').value, depNo: document.getElementById('edit-dep-no').value, depFrom: document.getElementById('edit-dep-from').value, depTo: document.getElementById('edit-dep-to').value, depTime: document.getElementById('edit-dep-time').value, depArrTime: document.getElementById('edit-dep-arr').value, arrDate: document.getElementById('edit-arr-date').value, arrNo: document.getElementById('edit-arr-no').value, arrFrom: document.getElementById('edit-arr-from').value, arrTo: document.getElementById('edit-arr-to').value, arrTime: document.getElementById('edit-arr-time').value, arrArrTime: document.getElementById('edit-arr-arr').value };
             closeModal('mainFlightEditModal'); openFlightModal(); await pushData();
         }
-
-        // --- 天氣、行程、清單其餘 ---
-        async function updateWeather() {
-            const container = document.getElementById('weatherContainer'); container.innerHTML = '<p class="opacity-40 py-2">Loading...</p>';
-            try {
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,precipitation_probability,weathercode&forecast_days=1");
-                const data = await res.json(); const now = new Date().getHours(); let html = '';
-                for(let i=0; i<6; i++){
-                    const idx = (now + i) % 24; const temp = Math.round(data.hourly.temperature_2m[idx]); const prob = data.hourly.precipitation_probability[idx]; const code = data.hourly.weathercode[idx];
-                    let icon = 'fa-cloud'; if(code === 0) icon = 'fa-sun text-amber-500'; else if(code <= 3) icon = 'fa-cloud-sun text-stone-400'; else if(code <= 67) icon = 'fa-cloud-showers-heavy text-blue-400';
-                    html += '<div class="weather-item"><p class="font-black opacity-30">' + idx + ':00</p><i class="fa-solid ' + icon + ' text-2xl my-3"></i><p class="font-black text-gray-700">' + temp + '°</p><p class="font-bold text-blue-400">' + prob + '%</p></div>';
-                }
-                container.innerHTML = html;
-            } catch(e) { container.innerHTML = 'Error'; }
-        }
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function openAddItinerary() { document.getElementById('itIdx').value = -1; document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); openModal('itineraryModal'); }
         function openEditItinerary(idx) { const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; document.getElementById('itDrive').value = it.driveInfo || ""; document.getElementById('itNote').value = it.note; openModal('itineraryModal'); }
         async function saveItinerary() { const idx = parseInt(document.getElementById('itIdx').value); const data = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, driveInfo: document.getElementById('itDrive').value, note: document.getElementById('itNote').value }; if(idx === -1) db.itinerary.push(data); else db.itinerary[idx] = data; db.itinerary.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time)); closeModal('itineraryModal'); await pushData(); }
-        async function resetToDefault() { if(confirm("管理者警告：恢復 7 天行程備份？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); toast("已恢復！"); } }
+        async function resetToDefault() { if(confirm("管理者救援：恢復 7 天行程備份？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); toast("已恢復！"); } }
         async function addItem(type) { const inp = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); if(inp.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: inp.value, done: false}); inp.value = ''; await pushData(); } }
         async function toggleCheck(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy)[idx].done = !(type === 'bring' ? db.checkBring : db.checkBuy)[idx].done; await pushData(); }
         async function delItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy).splice(idx, 1); await pushData(); }
-        function renderCheckList(type, list, containerId) { document.getElementById(containerId).innerHTML = list.map((item, idx) => '<li class="flex items-center justify-between py-5 text-left"><div class="flex items-center gap-5 cursor-pointer" onclick="toggleCheck(\'' + type + '\',' + idx + ')"><i class="fa-solid ' + (item.done ? 'fa-square-check text-amber-500' : 'fa-square text-stone-100') + ' text-4xl"></i><span class="' + (item.done ? 'line-through text-stone-300' : 'font-bold') + '">' + item.text + '</span></div><button onclick="delItem(\'' + type + '\',' + idx + ')" class="text-stone-200 text-3xl">×</button></li>').join(''); }
+        function renderCheckList(type, list, containerId) { document.getElementById(containerId).innerHTML = list.map((item, idx) => '<li class="flex items-center justify-between py-3 text-left"><div class="flex items-center gap-4 cursor-pointer" onclick="toggleCheck(\'' + type + '\',' + idx + ')"><i class="fa-solid ' + (item.done ? 'fa-square-check text-amber-500' : 'fa-square text-stone-100') + ' text-3xl"></i><span class="' + (item.done ? 'line-through text-stone-300' : 'font-bold') + '">' + item.text + '</span></div><button onclick="delItem(\'' + type + '\',' + idx + ')" class="text-stone-200 text-2xl">×</button></li>').join(''); }
         async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); await pushData(); } }
         async function delExp(idx) { db.expenses.splice(idx, 1); await pushData(); }
         async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); await pushData(); } document.getElementById('newPayer').value = ''; }
@@ -406,7 +403,6 @@
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
 
-        // --- 初始化啟動 ---
         init();
     </script>
 </body>
