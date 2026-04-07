@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>名古屋旅程 v4.10 管理者中心</title>
+    <title>名古屋旅程 v4.11 管理者中心</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +11,7 @@
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #1F2937; -webkit-tap-highlight-color: transparent; text-align: left; }
         .card { background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 15px; overflow: hidden; }
         
-        /* 🌤️ 氣象 UI：一屏顯示 3 小時，其餘滑動 */
+        /* 🌤️ 氣象 UI：一屏顯示 3 小時 */
         .weather-card { background: linear-gradient(135deg, #E2E8F0 0%, #F1F5F9 100%); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 18px; margin-bottom: 20px; color: #475569; }
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .weather-scroll::-webkit-scrollbar { display: none; }
@@ -38,7 +38,7 @@
     <header class="p-6 pt-10 flex justify-between items-center text-left">
         <div>
             <h1 class="text-3xl font-black text-gray-800 tracking-tighter">名古屋旅程</h1>
-            <p id="syncStatus" class="text-[10px] text-gray-400 mt-1 font-bold font-mono uppercase tracking-widest"><i class="fa-solid fa-shield-halved mr-1 text-[#E6B422]"></i> Admin v4.10</p>
+            <p id="syncStatus" class="text-[10px] text-gray-400 mt-1 font-bold font-mono uppercase tracking-widest"><i class="fa-solid fa-user-shield mr-1 text-[#E6B422]"></i> 管理者 v4.11</p>
         </div>
         <button onclick="pullData()" class="text-stone-300 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
@@ -47,9 +47,9 @@
         <div id="page-itinerary" class="page active">
             <div class="card p-5 border-t-4 border-[#E6B422] mb-4">
                 <div class="flex justify-between items-end">
-                    <div><h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2><p id="f-airline" class="text-[11px] text-gray-400 font-bold">FLIGHT INFO</p></div>
+                    <div><h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2><p id="f-airline" class="text-[11px] text-gray-400 font-bold uppercase">航班資訊</p></div>
                     <button onclick="copyPNR()" id="f-pnr" class="text-xl font-mono font-black text-blue-600 bg-blue-50 px-2 rounded">--</button>
-                    <button onclick="editFlightMain()" class="text-gray-200"><i class="fa-solid fa-gear"></i></button>
+                    <button onclick="editFlightMain()" class="text-gray-200 p-2"><i class="fa-solid fa-gear"></i></button>
                 </div>
             </div>
 
@@ -58,79 +58,15 @@
             <div class="weather-card shadow-sm">
                 <div class="flex justify-between items-center mb-4 text-[10px] font-bold opacity-60 uppercase tracking-widest">
                     <span>6-Hour Forecast</span>
-                    <button onclick="updateWeather()" class="bg-white/50 px-3 py-1 rounded-full">更新</button>
+                    <button onclick="updateWeather()" class="bg-white/50 px-3 py-1 rounded-full">更新數據</button>
                 </div>
                 <div id="weatherContainer" class="weather-scroll"></div>
             </div>
 
             <button onclick="openAddItinerary()" class="muji-btn mb-6 shadow-md"><i class="fa-solid fa-plus mr-2"></i>新增行程項目</button>
-            <div id="itineraryList"></div>
+            <div id="itineraryList" class="space-y-0"></div>
+
+            <button onclick="resetToDefault()" class="w-full py-3 mt-10 text-red-200 text-[10px] font-bold border border-red-50 rounded-xl">🆘 管理者應急恢復行程</button>
         </div>
 
-        <div id="page-items" class="page text-left">
-            <h2 class="text-2xl font-black mb-6">物品清單</h2>
-            <div class="card p-5 border-t-4 border-blue-400 mb-6">
-                <h3 class="font-black text-blue-500 mb-4">要攜帶的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="例：駕照譯本"><button onclick="addItem('bring')" class="muji-btn w-auto px-5 bg-blue-500">+</button></div>
-                <ul id="bringList" class="divide-y divide-gray-50"></ul>
-            </div>
-            <div class="card p-5 border-t-4 border-red-400">
-                <h3 class="font-black text-red-500 mb-4">要購買的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="例：樂高"><button onclick="addItem('buy')" class="muji-btn w-auto px-5 bg-red-500">+</button></div>
-                <ul id="buyList" class="divide-y divide-gray-50"></ul>
-            </div>
-        </div>
-
-        <div id="page-budget" class="page text-left">
-            <div class="card p-8 bg-stone-800 text-white text-center mb-6"><div class="text-4xl font-black tracking-tighter">¥ <span id="totalSpend">0</span></div><div class="text-sm opacity-50 mt-1 font-bold">≈ NT$ <span id="totalTWD">0</span></div></div>
-            <div id="payerStats" class="grid grid-cols-2 gap-3 mb-6"></div>
-            <div class="card p-6">
-                <input id="expName" type="text" placeholder="品項名稱">
-                <div class="relative"><input id="expCost" type="number" placeholder="日圓 (JPY)" oninput="calcTWD(this.value)"><div id="quickTWD" class="absolute right-3 top-3 text-[10px] text-gray-400 font-bold bg-gray-50 px-1 rounded">≈ NT$ 0</div></div>
-                <select id="expPayer" class="bg-gray-50"></select>
-                <button onclick="addExp()" class="muji-btn mt-2 shadow-md">紀錄支出</button>
-            </div>
-            <div id="expList" class="space-y-3 mt-6"></div>
-        </div>
-
-        <div id="page-tools" class="page text-left">
-            <h2 class="text-2xl font-black mb-6">管理者設定</h2>
-            <div class="card p-6">
-                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase tracking-widest">付款人名單</h3>
-                <div class="flex gap-2 mb-6"><input id="newPayer" type="text" placeholder="姓名"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div>
-                <div id="payerManagerList" class="flex flex-wrap gap-2 mb-6"></div>
-                <hr class="my-6 border-gray-50">
-                <label class="text-[11px] font-black text-gray-500 uppercase">匯率設定</label>
-                <input id="exRate" type="number" step="0.001" value="0.21" onchange="pushData()" class="mt-1 font-bold">
-                <hr class="my-6 border-gray-50">
-                <button onclick="resetToDefault()" class="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black text-sm mb-4 border border-red-100">恢復 7 天預設行程</button>
-                <button onclick="clearAllData()" class="w-full text-gray-300 text-[10px] font-bold">清空雲端資料</button>
-            </div>
-        </div>
-    </main>
-
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 flex justify-around py-4 pb-8 z-50">
-        <button onclick="switchPage('itinerary')" id="nav-itinerary" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-calendar-check text-xl"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
-        <button onclick="switchPage('items')" id="nav-items" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-toolbox text-xl"></i><span class="text-[10px] mt-1 font-bold">物品</span></button>
-        <button onclick="switchPage('budget')" id="nav-budget" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-yen-sign text-xl"></i><span class="text-[10px] mt-1 font-bold">記帳</span></button>
-        <button onclick="switchPage('tools')" id="nav-tools" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-sliders text-xl"></i><span class="text-[10px] mt-1 font-bold">設定</span></button>
-    </nav>
-
-    <div id="viewModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[200] backdrop-blur-md text-left">
-        <div class="card w-full p-8 relative flex flex-col min-h-[60vh]">
-            <button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-gray-300 text-3xl">&times;</button>
-            <div id="viewContent" class="flex-grow"></div>
-            <div class="mt-8 space-y-4">
-                <button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-2xl font-black text-2xl shadow-xl"><i class="fa-solid fa-location-arrow mr-2"></i> 開始導航</button>
-                <div class="grid grid-cols-2 gap-4">
-                    <button id="viewEditBtn" class="py-5 bg-gray-100 rounded-2xl font-bold text-gray-600 text-xl"><i class="fa-solid fa-pen mr-2"></i> 編輯</button>
-                    <button id="viewAiBtn" class="py-5 bg-stone-100 rounded-2xl font-bold text-gray-600 text-xl"><i class="fa-solid fa-robot mr-2 text-blue-400"></i> 問 AI</button>
-                </div>
-                <div class="pt-10 border-t border-gray-50 flex justify-center">
-                    <button id="viewDelBtn" class="text-red-400 font-bold text-lg p-4 opacity-60"><i class="fa-solid fa-trash-can mr-2"></i> 刪除此項目</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-
+        <div id="page-items"
