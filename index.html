@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>名古屋旅程 v4.5 管理者中心</title>
+    <title>名古屋旅程 v4.5.1 管理者中心</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +16,7 @@
         .muji-btn:active { transform: scale(0.96); }
         .page { display: none; animation: slideIn 0.3s ease-out; padding-bottom: 120px; }
         .page.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
         .nav-active { color: #8D6E63 !important; }
         #syncBar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #E6B422; z-index: 9999; transform: scaleX(0); transition: transform 0.4s; transform-origin: left; }
         input, select, textarea { width: 100%; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px; margin-bottom: 10px; outline: none; background: #fff; text-align: left !important; font-size: 16px !important; }
@@ -44,7 +44,7 @@
                 <div class="flex justify-between items-end">
                     <div>
                         <h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2>
-                        <p id="f-airline" class="text-[11px] text-gray-400 font-bold uppercase">航空公司預約</p>
+                        <p id="f-airline" class="text-[11px] text-gray-400 font-bold uppercase">預約資訊</p>
                     </div>
                     <div class="text-right">
                         <p class="text-[9px] text-gray-400 font-bold mb-1">PNR CODE</p>
@@ -52,13 +52,13 @@
                     </div>
                 </div>
                 <div class="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-gray-50">
-                    <div><p class="text-[9px] text-gray-400 font-bold">DEPART</p><p id="f-dep" class="font-black text-sm">--</p></div>
+                    <div><p class="text-[9px] text-gray-400 font-bold uppercase">Depart</p><p id="f-dep" class="font-black text-sm">--</p></div>
                     <div class="text-center text-[#E6B422] self-center"><i class="fa-solid fa-plane-arrival text-lg"></i></div>
-                    <div class="text-right"><p class="text-[9px] text-gray-400 font-bold">ARRIVE</p><p id="f-arr" class="font-black text-sm">--</p></div>
+                    <div class="text-right"><p class="text-[9px] text-gray-400 font-bold uppercase">Arrive</p><p id="f-arr" class="font-black text-sm">--</p></div>
                 </div>
             </div>
 
-            <div class="flex overflow-x-auto gap-3 pb-4 mb-4 no-scrollbar" style="scrollbar-width: none;">
+            <div class="flex overflow-x-auto gap-3 pb-4 mb-4" style="scrollbar-width: none;">
                 <div id="passengerList" class="flex gap-3"></div>
             </div>
 
@@ -68,7 +68,7 @@
                     <button onclick="updateWeather()" class="text-[10px] bg-white/10 px-2 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i>重整</button>
                 </div>
                 <div id="weatherContainer" class="weather-scroll text-left">
-                    <p class="text-xs opacity-40 py-2">點擊重整獲取名古屋氣象...</p>
+                    <p class="text-xs opacity-40 py-2">點擊重整獲取氣象...</p>
                 </div>
             </div>
 
@@ -76,16 +76,16 @@
         </div>
 
         <div id="page-items" class="page">
-            <h2 class="text-2xl font-black mb-6">物品清單</h2>
+            <h2 class="text-2xl font-black mb-6 text-left">物品清單</h2>
             <div class="card p-5 border-t-4 border-blue-500 mb-6">
                 <h3 class="font-black text-blue-600 mb-4"><i class="fa-solid fa-suitcase mr-2"></i>要攜帶的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="帶什麼？"><button onclick="addItem('bring')" class="muji-btn w-auto px-4 bg-blue-600">+</button></div>
-                <ul id="bringList" class="divide-y divide-gray-50"></ul>
+                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="例：護照、尿布..."><button onclick="addItem('bring')" class="muji-btn w-auto px-4 bg-blue-600">+</button></div>
+                <ul id="bringList" class="divide-y divide-gray-50 text-left"></ul>
             </div>
             <div class="card p-5 border-t-4 border-red-500">
                 <h3 class="font-black text-red-600 mb-4"><i class="fa-solid fa-bag-shopping mr-2"></i>要購買的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="買什麼？"><button onclick="addItem('buy')" class="muji-btn w-auto px-4 bg-red-600">+</button></div>
-                <ul id="buyList" class="divide-y divide-gray-50"></ul>
+                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="例：合利他命、樂高..."><button onclick="addItem('buy')" class="muji-btn w-auto px-4 bg-red-600">+</button></div>
+                <ul id="buyList" class="divide-y divide-gray-50 text-left"></ul>
             </div>
         </div>
 
@@ -98,7 +98,7 @@
             <div class="card p-6">
                 <input id="expName" type="text" placeholder="品項名稱">
                 <div class="relative">
-                    <input id="expCost" type="number" placeholder="金額 (JPY)" oninput="calcTWD(this.value)">
+                    <input id="expCost" type="number" placeholder="日圓 (JPY)" oninput="calcTWD(this.value)">
                     <div id="quickTWD" class="absolute right-3 top-3 text-[10px] text-gray-400 font-bold bg-gray-50 px-1 rounded">≈ NT$ 0</div>
                 </div>
                 <select id="expPayer" class="bg-gray-50"></select>
@@ -109,16 +109,17 @@
 
         <div id="page-tools" class="page">
             <h2 class="text-2xl font-black mb-6">管理者中心</h2>
-            <div class="card p-6">
-                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase tracking-widest">匯率與偏好</h3>
+            <div class="card p-6 text-left">
+                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase tracking-widest">匯率設定</h3>
                 <div class="mb-6">
-                    <label class="text-[11px] font-black text-gray-500 ml-1">1 日幣 換 台幣 (JPY to TWD)</label>
+                    <label class="text-[11px] font-black text-gray-500 ml-1">1 JPY = ? TWD</label>
                     <input id="exRate" type="number" step="0.001" value="0.21" onchange="pushData()" class="mt-1 font-bold text-lg">
                 </div>
                 <hr class="my-6 border-gray-50">
                 <h3 class="font-bold mb-4 text-red-400 text-xs uppercase tracking-widest">管理者救援區</h3>
-                <button onclick="resetToDefault()" class="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black text-sm mb-4 border border-red-100">強制恢復 7 天預設行程</button>
-                <button onclick="clearAllData()" class="w-full text-gray-300 text-[10px] font-bold">清空雲端資料庫</button>
+                <button onclick="resetToDefault()" class="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black text-sm mb-2 border border-red-100">強制恢復 7 天預設行程</button>
+                <p class="text-[10px] text-gray-400 mb-6">點擊後會用 5/23 - 5/29 完整計畫覆蓋雲端。</p>
+                <button onclick="clearAllData()" class="w-full text-gray-300 text-[10px] font-bold">清空雲端資料</button>
             </div>
         </div>
     </main>
@@ -131,77 +132,78 @@
     </nav>
 
     <div id="flightMainModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm">
-        <div class="card w-full p-6"><h3 class="font-black mb-4">航班總覽編輯</h3><input id="m-airline" type="text" placeholder="航空公司"><input id="m-no" type="text" placeholder="班機號碼"><input id="m-pnr" type="text" placeholder="預約代號 (PNR)"><div class="grid grid-cols-2 gap-2"><input id="m-dep" type="text" placeholder="起飛時間"><input id="m-arr" type="text" placeholder="抵達時間"></div><div class="flex gap-2 mt-4"><button onclick="closeModal('flightMainModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveFlightMain()" class="flex-1 muji-btn">儲存</button></div></div>
+        <div class="card w-full p-6"><h3 class="font-black mb-4">航班主資訊</h3><input id="m-airline" type="text" placeholder="航空公司"><input id="m-no" type="text" placeholder="班機號碼"><input id="m-pnr" type="text" placeholder="PNR"><div class="grid grid-cols-2 gap-2"><input id="m-dep" type="text" placeholder="起飛時間"><input id="m-arr" type="text" placeholder="抵達時間"></div><div class="flex gap-2 mt-4"><button onclick="closeModal('flightMainModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveFlightMain()" class="flex-1 muji-btn">儲存</button></div></div>
     </div>
-
     <div id="psgrModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm">
-        <div class="card w-full p-6"><h3 id="psgrTitle" class="font-black mb-4">旅客編輯</h3><input type="hidden" id="psgrIdx"><input id="psgrName" type="text" placeholder="旅客姓名"><input id="psgrSeat" type="text" placeholder="座位編號 (例: 22A)"><textarea id="psgrNote" placeholder="個人備註 (例: 兒童餐/特別餐)" class="h-24"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('psgrModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="savePassenger()" class="flex-1 muji-btn">儲存</button></div></div>
+        <div class="card w-full p-6"><h3 id="psgrTitle" class="font-black mb-4">旅客</h3><input type="hidden" id="psgrIdx"><input id="psgrName" type="text" placeholder="姓名"><input id="psgrSeat" type="text" placeholder="座位"><textarea id="psgrNote" placeholder="餐點/個人備註" class="h-24"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('psgrModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="savePassenger()" class="flex-1 muji-btn">儲存</button></div></div>
     </div>
-
     <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm">
-        <div class="card w-full p-6 h-[80vh] overflow-y-auto"><h3 id="itTitle" class="font-black mb-4">編輯行程</h3><input type="hidden" id="itIdx"><div class="grid grid-cols-2 gap-2"><input id="itDate" type="text" placeholder="日期"><input id="itTime" type="time"></div><input id="itHeading" type="text" placeholder="標題"><input id="itLoc" type="text" placeholder="地點/停車場"><textarea id="itNote" placeholder="管理者備註..." class="h-32"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('itineraryModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveItinerary()" class="flex-1 muji-btn">儲存</button></div><button onclick="deleteItinerary()" class="w-full text-red-300 text-[10px] mt-6">刪除此項目</button></div>
+        <div class="card w-full p-6 h-[80vh] overflow-y-auto"><h3 id="itTitle" class="font-black mb-4">編輯行程</h3><input type="hidden" id="itIdx"><div class="grid grid-cols-2 gap-2"><input id="itDate" type="text" placeholder="日期"><input id="itTime" type="time"></div><input id="itHeading" type="text" placeholder="標題"><input id="itLoc" type="text" placeholder="導航至(停車場/地址)"><textarea id="itNote" placeholder="管理者備註..." class="h-40"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('itineraryModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveItinerary()" class="flex-1 muji-btn">儲存</button></div><button onclick="deleteItinerary()" class="w-full text-red-300 text-[10px] mt-6">刪除行程</button></div>
     </div>
-
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-6 py-3 rounded-full opacity-0 transition-opacity z-[9999] pointer-events-none"></div>
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
         
-        // 內建名古屋 7 天管理者救援行程
-        const defaultData = {
-            title: "名古屋親子行",
-            flightMain: { airline: "航空公司預約", no: "JX830", pnr: "ABCDEF", dep: "10:00", arr: "14:00" },
+        // --- 核心：5/23 - 5/29 完整名古屋精華資料 ---
+        const masterData = {
+            title: "名古屋親子悠閒行",
+            flightMain: { airline: "航空公司", no: "JX830", pnr: "ABCDEF", dep: "05/23 10:00", arr: "05/23 14:00" },
             passengers: [
-                { name: "旅客 1", seat: "--", note: "成人", type: "adult" },
-                { name: "旅客 2", seat: "--", note: "成人", type: "adult" },
-                { name: "旅客 3", seat: "--", note: "成人", type: "adult" },
-                { name: "小孩 1", seat: "--", note: "兒童餐", type: "kid" },
-                { name: "小孩 2", seat: "--", note: "兒童餐", type: "kid" }
+                { name: "薇那(管理者)", seat: "22A", note: "一般餐", type: "adult" },
+                { name: "成人 B", seat: "22B", note: "一般餐", type: "adult" },
+                { name: "成人 C", seat: "22C", note: "一般餐", type: "adult" },
+                { name: "小孩 1", seat: "21A", note: "兒童餐", type: "kid" },
+                { name: "小孩 2", seat: "21B", note: "兒童餐", type: "kid" }
             ],
             itinerary: [
-                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場", note: "取車自駕去武士之家。" },
-                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", note: "吃味噌豬排！" },
-                { date: "05/24", time: "11:00", title: "悠閒出發 (Legoland)", location: "金城ふ頭停車場", note: "樂高樂園親子日。" },
-                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV Park", note: "室內吹冷氣看火車。" },
-                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "長島度假村", note: "小孩最愛的地方。" },
-                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "港水族館停車場", note: "看虎鯨表演。" },
-                { date: "05/28", time: "11:00", title: "豐田技術館", location: "トヨタ產業館", note: "適合雨備或室內遊玩。" },
-                { date: "05/29", time: "11:30", title: "回程 & 機場還車", location: "中部國際機場", note: "14:30 前要報到。" }
+                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場(取車點)", note: "辦理取車手續。檢查：日文譯本、駕照、小孩增高墊。" },
+                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", note: "晚餐推：名古屋特色味噌豬排（我們吃豬肉！）。附近有 Times 榮第 4 停車場。" },
+                { date: "05/24", time: "11:00", title: "悠閒出發 (Legoland)", location: "金城ふ頭駐車場", note: "導航直接設：金城埠頭立體停車場。步行 5min 抵達樂高樂園。" },
+                { date: "05/24", time: "13:00", title: "名古屋樂高樂園", location: "LEGOLAND Japan", note: "4.5 歲小孩體力極限，適時休息。門口有 Maker's Pier 餐廳區。" },
+                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV and Railway Park", note: "室內吹冷氣看火車。有巨大鐵道模型，小孩會瘋狂。" },
+                { date: "05/25", time: "17:00", title: "AEON Mall 名古屋港明", location: "LaLaport Nagoya Minato AQULS", note: "停車位超多。適合吃晚餐與最後採買。" },
+                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "名古屋アンパンマン樂園", note: "導航：長島渡假村停車場。小孩最期待的點！" },
+                { date: "05/26", time: "16:00", title: "Jazz Dream Outlet", location: "三井長島 Outlet", note: "就在麵包超人隔壁。大人可以輪流換手去逛街。" },
+                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "名古屋港水族館停車場", note: "必看：虎鯨、海豚表演。全室內，不用怕下雨或曬太陽。" },
+                { date: "05/27", time: "15:00", title: "Sea Train Land", location: "シートレインランド", note: "水族館旁免門票樂園。玩摩天輪看港區美景。" },
+                { date: "05/28", time: "11:00", title: "豐田技術館 or 動物園", location: "トヨタ產業技術紀念館", note: "雨備：技術館（室內超大遊樂區）。晴天：東山動植物園。" },
+                { date: "05/29", time: "11:00", title: "早午餐 & 機場還車", location: "中部國際機場(還車點)", note: "悠閒吃早餐，14:00 前完成還車與報到。16:35 起飛。" }
             ],
-            checkBring: [{text: "日文譯本", done: false}, {text: "小孩推車", done: false}],
-            checkBuy: [{text: "樂高積木", done: false}],
+            checkBring: [{text: "日文譯本", done: false}, {text: "護照", done: false}, {text: "小孩推車", done: false}],
+            checkBuy: [{text: "樂高積木", done: false}, {text: "藥妝", done: false}],
             expenses: [],
-            payers: ["薇那", "大人 A", "大人 B"],
+            payers: ["薇那", "成人B", "成人C"],
             rate: 0.21
         };
 
-        let db = JSON.parse(JSON.stringify(defaultData));
+        let db = JSON.parse(JSON.stringify(masterData));
 
-        // --- 核心同步邏輯 ---
+        // --- 同步邏輯 ---
         async function pullData() {
             showSync(true);
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
-                if(data && data.itinerary) db = data;
-                toast("管理者同步成功");
-            } catch (e) { toast("離線模式"); }
+                if(data && data.itinerary && data.itinerary.length > 0) db = data;
+                toast("雲端同步成功");
+            } catch (e) { toast("目前為離線模式"); }
             renderAll(); showSync(false);
         }
-
         async function pushData() {
             showSync(true);
             db.rate = parseFloat(document.getElementById('exRate').value) || 0.21;
             try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e) {}
             renderAll(); showSync(false);
         }
+        async function resetToDefault() { if(confirm("管理者警告：這會把 5/23 - 5/29 的完整計畫蓋掉雲端目前內容。確定？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); toast("行程已恢復！"); } }
 
-        // --- 天氣預報 (6H) ---
+        // --- 氣象 (6H) ---
         async function updateWeather() {
             const container = document.getElementById('weatherContainer');
-            container.innerHTML = '<p class="text-[10px] opacity-40 py-2">更新中...</p>';
+            container.innerHTML = '<p class="text-[10px] opacity-40 py-2">獲取預報中...</p>';
             try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=35.1815&longitude=136.9064&hourly=temperature_2m,precipitation_probability&forecast_days=1`);
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,precipitation_probability&forecast_days=1`);
                 const data = await res.json();
                 const now = new Date().getHours();
                 let html = '';
@@ -211,46 +213,39 @@
                     const prob = data.hourly.precipitation_probability[idx];
                     html += `<div class="weather-item"><p class="text-[9px] font-bold opacity-30">${idx}:00</p><p class="text-lg font-black">${temp}°</p><p class="text-[9px] ${prob > 30 ? 'text-blue-500 font-bold' : 'opacity-30'}"><i class="fa-solid fa-droplet text-[7px]"></i> ${prob}%</p></div>`;
                 }
-                container.innerHTML = html; toast("名古屋氣象已更新");
+                container.innerHTML = html; toast("氣象已更新");
             } catch(e) { container.innerHTML = '連線失敗'; }
         }
 
-        // --- UI 渲染 ---
+        // --- 渲染渲染 ---
         function renderAll() {
-            // 航班
-            document.getElementById('f-airline').innerText = db.flightMain.airline;
             document.getElementById('f-no').innerText = db.flightMain.no;
             document.getElementById('f-pnr').innerText = db.flightMain.pnr;
             document.getElementById('f-dep').innerText = db.flightMain.dep;
             document.getElementById('f-arr').innerText = db.flightMain.arr;
+            document.getElementById('f-airline').innerText = db.flightMain.airline;
 
-            // 旅客
             const psList = document.getElementById('passengerList'); psList.innerHTML = '';
             db.passengers.forEach((p, idx) => {
                 psList.innerHTML += `<div onclick="editPassenger(${idx})" class="flex-none w-28 p-4 bg-gray-50 border border-gray-100 rounded-2xl">
-                    <p class="text-[9px] font-black text-stone-400 mb-1 uppercase tracking-tighter">${p.type}</p>
+                    <p class="text-[9px] font-black text-stone-300 mb-1 tracking-tighter">${p.type.toUpperCase()}</p>
                     <h4 class="font-black text-sm truncate">${p.name}</h4>
                     <p class="text-[10px] font-mono font-bold text-blue-600 mt-1">${p.seat || '--'}</p>
                 </div>`;
             });
 
-            // 行程
             const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
             db.itinerary.forEach((it, idx) => {
-                itList.innerHTML += `<div onclick="openEditItinerary(${idx})" class="card p-5 border-l-[6px] border-stone-400 active:bg-gray-50 transition-colors">
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-[10px] font-black text-stone-400 uppercase tracking-widest">${it.date} ${it.time}</span>
-                    </div>
-                    <h3 class="text-xl font-black text-gray-800">${it.title}</h3>
+                itList.innerHTML += `<div onclick="openEditItinerary(${idx})" class="card p-6 border-l-[6px] border-stone-400 active:bg-gray-50 transition-colors">
+                    <span class="text-[10px] font-black text-stone-300 uppercase tracking-widest">${it.date} ${it.time}</span>
+                    <h3 class="text-xl font-black text-gray-800 mt-1">${it.title}</h3>
                     <p class="text-xs text-blue-500 mt-2 font-bold"><i class="fa-solid fa-location-dot mr-1"></i> ${it.location}</p>
                 </div>`;
             });
 
-            // 物品清單
             renderCheckList('bring', db.checkBring, 'bringList');
             renderCheckList('buy', db.checkBuy, 'buyList');
 
-            // 記帳
             const rate = db.rate || 0.21;
             document.getElementById('exRate').value = rate;
             let total = 0;
@@ -273,7 +268,7 @@
                 <li class="flex items-center justify-between py-3">
                     <div class="flex items-center gap-3 cursor-pointer" onclick="toggleItem('${type}', ${idx})">
                         <i class="fa-solid ${item.done ? 'fa-square-check text-green-500' : 'fa-square text-gray-100'} text-2xl"></i>
-                        <span class="${item.done ? 'line-through text-gray-300' : 'font-bold text-gray-600'}">${item.text}</span>
+                        <span class="${item.done ? 'line-through text-gray-400' : 'font-bold text-gray-600'}">${item.text}</span>
                     </div>
                     <button onclick="delItem('${type}', ${idx})" class="text-gray-200 text-xl">&times;</button>
                 </li>
@@ -281,7 +276,6 @@
         }
 
         // --- 互動功能 ---
-        async function resetToDefault() { if(confirm("管理者警告：確定要強制恢復 7 天預設行程嗎？這會覆蓋雲端現有資料。")) { db = JSON.parse(JSON.stringify(defaultData)); await pushData(); toast("救援成功"); } }
         async function addItem(type) { 
             const input = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); 
             if(input.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: input.value, done: false}); input.value = ''; await pushData(); }
@@ -291,22 +285,20 @@
         async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); document.getElementById('expName').value=''; document.getElementById('expCost').value=''; await pushData(); } }
         async function delExp(idx) { db.expenses.splice(idx, 1); await pushData(); }
         function calcTWD(val) { const rate = parseFloat(document.getElementById('exRate').value) || 0.21; document.getElementById('quickTWD').innerText = `≈ NT$ ${Math.round(val * rate).toLocaleString()}`; }
-        
-        // Modal 控制
         function switchPage(p) { document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.getElementById('page-'+p).classList.add('active'); document.querySelectorAll('nav button').forEach(el => el.classList.remove('nav-active')); document.getElementById('nav-'+p).classList.add('nav-active'); window.scrollTo(0,0); }
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function editFlightMain() { document.getElementById('m-airline').value = db.flightMain.airline; document.getElementById('m-no').value = db.flightMain.no; document.getElementById('m-pnr').value = db.flightMain.pnr; document.getElementById('m-dep').value = db.flightMain.dep; document.getElementById('m-arr').value = db.flightMain.arr; openModal('flightMainModal'); }
         async function saveFlightMain() { db.flightMain = { airline: document.getElementById('m-airline').value, no: document.getElementById('m-no').value, pnr: document.getElementById('m-pnr').value, dep: document.getElementById('m-dep').value, arr: document.getElementById('m-arr').value }; await pushData(); closeModal('flightMainModal'); }
-        function editPassenger(idx) { const p = db.passengers[idx]; document.getElementById('psgrIdx').value = idx; document.getElementById('psgrTitle').innerText = `旅客: ${p.type}`; document.getElementById('psgrName').value = p.name; document.getElementById('psgrSeat').value = p.seat; document.getElementById('psgrNote').value = p.note; openModal('psgrModal'); }
+        function editPassenger(idx) { const p = db.passengers[idx]; document.getElementById('psgrIdx').value = idx; document.getElementById('psgrTitle').innerText = `編輯旅客: ${p.type}`; document.getElementById('psgrName').value = p.name; document.getElementById('psgrSeat').value = p.seat; document.getElementById('psgrNote').value = p.note; openModal('psgrModal'); }
         async function savePassenger() { const idx = document.getElementById('psgrIdx').value; db.passengers[idx].name = document.getElementById('psgrName').value; db.passengers[idx].seat = document.getElementById('psgrSeat').value; db.passengers[idx].note = document.getElementById('psgrNote').value; await pushData(); closeModal('psgrModal'); }
         function openEditItinerary(idx) { const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; document.getElementById('itNote').value = it.note; openModal('itineraryModal'); }
         async function saveItinerary() { const idx = document.getElementById('itIdx').value; db.itinerary[idx] = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, note: document.getElementById('itNote').value }; db.itinerary.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time)); await pushData(); closeModal('itineraryModal'); }
         async function deleteItinerary() { if(confirm("確定刪除？")) { const idx = document.getElementById('itIdx').value; db.itinerary.splice(idx, 1); await pushData(); closeModal('itineraryModal'); } }
-
+        async function clearAllData() { if(confirm("確定清空所有資料嗎？")) { db.itinerary = []; db.expenses = []; db.checkBring = []; db.checkBuy = []; await pushData(); } }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.remove('opacity-0'); setTimeout(() => t.classList.add('opacity-0'), 2500); }
-        function copyPNR() { const pnr = document.getElementById('f-pnr').innerText; navigator.clipboard.writeText(pnr); toast("代號已複製"); }
+        function copyPNR() { const pnr = document.getElementById('f-pnr').innerText; navigator.clipboard.writeText(pnr); toast("訂位代號已複製"); }
 
         async function init() { await pullData(); switchPage('itinerary'); }
         init();
