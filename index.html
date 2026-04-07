@@ -3,70 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>名古屋旅程 v4.11 管理者中心</title>
+    <title>名古屋旅程 v5.0 管理者中心</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #1F2937; -webkit-tap-highlight-color: transparent; text-align: left; }
-        .card { background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 15px; overflow: hidden; }
-        
-        /* 🌤️ 氣象 UI：一屏顯示 3 小時 */
-        .weather-card { background: linear-gradient(135deg, #E2E8F0 0%, #F1F5F9 100%); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 18px; margin-bottom: 20px; color: #475569; }
+        .card { background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .weather-card { background: linear-gradient(135deg, #E2E8F0 0%, #F1F5F9 100%); border-radius: 20px; padding: 18px; margin-bottom: 20px; color: #475569; }
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .weather-scroll::-webkit-scrollbar { display: none; }
-        .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.6); padding: 12px 5px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.4); }
-        
-        .muji-btn { background-color: #8D6E63; color: white; padding: 16px; border-radius: 16px; font-weight: bold; width: 100%; text-align: center; cursor: pointer; display: block; border: none; }
-        .muji-btn:active { opacity: 0.8; transform: scale(0.98); }
-        .page { display: none; animation: fadeIn 0.3s ease-out; padding-bottom: 150px; }
+        .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.6); padding: 12px 5px; border-radius: 18px; }
+        .muji-btn { background-color: #8D6E63; color: white; padding: 16px; border-radius: 16px; font-weight: bold; width: 100%; text-align: center; cursor: pointer; display: block; }
+        .page { display: none; padding-bottom: 150px; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; } }
-        
         #syncBar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #E6B422; z-index: 9999; transform: scaleX(0); transition: transform 0.4s; transform-origin: left; }
-        input, select, textarea { width: 100%; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-bottom: 12px; outline: none; background: #fff; text-align: left !important; font-size: 16px !important; }
-        
+        input, select, textarea { width: 100%; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-bottom: 12px; outline: none; background: #fff; font-size: 16px !important; }
+        .nav-active { color: #8D6E63 !important; }
         .drive-line { border-left: 2px dashed #CBD5E1; margin-left: 30px; padding: 10px 0 25px 25px; position: relative; }
         .drive-line::before { content: "\f1b9"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); background: #F8F9FA; color: #CBD5E1; padding: 2px 0; }
-        .nav-active { color: #8D6E63 !important; }
     </style>
 </head>
 <body class="max-w-md mx-auto min-h-screen relative">
-
     <div id="syncBar"></div>
 
     <header class="p-6 pt-10 flex justify-between items-center text-left">
         <div>
             <h1 class="text-3xl font-black text-gray-800 tracking-tighter">名古屋旅程</h1>
-            <p id="syncStatus" class="text-[10px] text-gray-400 mt-1 font-bold font-mono uppercase tracking-widest"><i class="fa-solid fa-user-shield mr-1 text-[#E6B422]"></i> 管理者 v4.11</p>
+            <p id="syncStatus" class="text-[10px] text-gray-400 mt-1 font-bold uppercase tracking-widest"><i class="fa-solid fa-crown mr-1 text-[#E6B422]"></i> 管理者 v5.0</p>
         </div>
         <button onclick="pullData()" class="text-stone-300 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
     <main class="px-5">
         <div id="page-itinerary" class="page active">
-            <div class="card p-5 border-t-4 border-[#E6B422] mb-4">
+            <div class="card p-5 border-t-4 border-[#E6B422] mb-4 text-left">
                 <div class="flex justify-between items-end">
-                    <div><h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2><p id="f-airline" class="text-[11px] text-gray-400 font-bold uppercase">航班資訊</p></div>
+                    <div><h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2><p id="f-airline" class="text-[11px] text-gray-400 font-bold">航班預約</p></div>
                     <button onclick="copyPNR()" id="f-pnr" class="text-xl font-mono font-black text-blue-600 bg-blue-50 px-2 rounded">--</button>
                     <button onclick="editFlightMain()" class="text-gray-200 p-2"><i class="fa-solid fa-gear"></i></button>
                 </div>
             </div>
-
-            <div class="flex overflow-x-auto gap-3 pb-4 mb-4 no-scrollbar" style="scrollbar-width: none;"><div id="passengerList" class="flex gap-3"></div></div>
-
-            <div class="weather-card shadow-sm">
+            <div class="flex overflow-x-auto gap-3 pb-4 mb-4 no-scrollbar"><div id="passengerList" class="flex gap-3"></div></div>
+            <div class="weather-card shadow-sm text-left">
                 <div class="flex justify-between items-center mb-4 text-[10px] font-bold opacity-60 uppercase tracking-widest">
-                    <span>6-Hour Forecast</span>
-                    <button onclick="updateWeather()" class="bg-white/50 px-3 py-1 rounded-full">更新數據</button>
+                    <span>6H Forecast</span>
+                    <button onclick="updateWeather()" class="bg-white/50 px-3 py-1 rounded-full">更新</button>
                 </div>
                 <div id="weatherContainer" class="weather-scroll"></div>
             </div>
-
-            <button onclick="openAddItinerary()" class="muji-btn mb-6 shadow-md"><i class="fa-solid fa-plus mr-2"></i>新增行程項目</button>
-            <div id="itineraryList" class="space-y-0"></div>
-
-            <button onclick="resetToDefault()" class="w-full py-3 mt-10 text-red-200 text-[10px] font-bold border border-red-50 rounded-xl">🆘 管理者應急恢復行程</button>
+            <button onclick="openAddItinerary()" class="muji-btn mb-6 shadow-md"><i class="fa-solid fa-plus mr-2"></i>新增行程</button>
+            <div id="itineraryList" class="text-left"></div>
+            <button onclick="resetToDefault()" class="w-full py-4 mt-20 text-red-200 text-[10px] font-bold border border-red-50 rounded-xl">🆘 管理者備用恢復按鈕</button>
         </div>
 
-        <div id="page-items"
+        <div id="page-items" class="page text-left">
+            <h2 class="text-2xl font-black mb-6">物品清單</h2>
+            <div class="card p-5 border-t-4 border-blue-400 mb-6">
+                <h3 class="font-black text-blue-500 mb-4 text-left">要攜帶</h3>
+                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="例：駕照譯本"><button onclick="addItem('bring')" class="muji-btn w-auto px-5 bg-blue-500">+</button></div>
+                <ul id="bringList" class="divide-y divide-gray-50"></ul>
+            </div>
+            <div class="card p-5 border-t-4 border-red-400">
+                <h3 class="font-black text-red-500 mb-4 text-left">要購買</h3>
+                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="例：藥妝"><button onclick="addItem('buy')" class="muji-btn w-auto px-5 bg-red-500">+</button></div>
+                <ul id="buyList" class="divide-y divide-gray-50"></ul>
+            </div>
+        </div>
+
+        <div id="page-budget" class="page text-left">
+            <div class="card p-8 bg-stone-800 text-white text-center mb-6">
+                <div class="text-4xl font-black tracking-tighter">¥ <span id="totalSpend">0</span></div>
+                <div class="text-sm opacity-50 mt-1 font-bold">≈ NT$ <span id="totalTWD">0</span></div>
+            </div>
+            <div id="payerStats" class="grid grid-cols-2 gap-3 mb-6"></div>
+            <div class="card p-6">
+                <input id="expName" type="text" placeholder="品項名稱">
+                <div class="relative"><input id="expCost" type="number" placeholder="日圓" oninput="calcTWD(this.value)"><div id="quickTWD" class="absolute right-3 top-3 text-[10px] text-gray-400 font-bold bg-gray-50 px-1 rounded">≈ NT$ 0</div></div>
+                <select id="expPayer" class="bg-gray-50"></select>
+                <button onclick="addExp()" class="muji-btn mt-2 shadow-md">紀錄支出</button>
+            </div>
+            <div id="expList" class="space-y-3 mt-6"></div>
+        </div>
+
+        <div id="page-tools" class="page text-left">
+            <h2 class="text-2xl font-black mb-6">管理者設定</h2>
+            <div class="card p-6">
+                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase">名單管理</h3>
+                <div class="flex gap-2 mb-6"><input id="newPayer" type="text" placeholder="姓名"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div>
+                <div id="payerManagerList" class="flex flex-wrap gap-2 mb-6"></div>
+                <hr class="my-6 border-gray-50">
+                <label class="text-[11px] font-black text-gray-500 uppercase tracking-widest">Exchange Rate (1 JPY = ? TWD)</label>
+                <input id="exRate" type="number" step="0.001" value="0.21" onchange="pushData()" class="mt-1 font-black text-lg">
+                <hr class="my-6 border-gray-50">
+                <button onclick="resetToDefault()" class="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black text-sm mb-4 border border-red-100">恢復 7 天預設行程</button>
+                <button onclick="clearAllData()" class="w-full text-gray-300 text-[10px] font-bold">清空資料庫</button>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 flex justify-around py-4 pb-8 z-50">
+        <button onclick="switchPage('itinerary')" id="nav-itinerary" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-calendar-check text-xl"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
+        <button onclick="switchPage('items')" id="nav-items" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-toolbox text-xl"></i><span class="text-[10px] mt-1 font-bold">物品</span></button>
+        <button onclick="switchPage('budget')" id="nav-budget" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-yen-sign text-xl"></i><span class="text-[10px] mt-1 font-bold">記帳</span></button>
+        <button onclick="switchPage('tools')" id="nav-tools" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-sliders text-xl"></i><span class="text-[10px] mt-1 font-bold">設定</span></button>
+    </nav>
+
+    <div id="viewModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[200] backdrop-blur-md text-left">
+        <div class="card w-full p-8 relative flex flex-col min-h-[60vh]">
+            <button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-gray-300 text-3xl">×</button>
+            <div id="viewContent" class="flex-grow"></div>
+            <div class="mt-8 space-y-4">
+                <button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-2xl font-black text-2xl shadow-xl"><i class="fa-solid fa-location-arrow mr-2"></i> 開始導航</button>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="viewEditBtn" class="py-5 bg-gray-100 rounded-2xl font-bold text-gray-600 text-xl">編輯</button>
+                    <button id="viewAiBtn" class="py-5 bg-stone-100 rounded-2xl font-bold text-gray-600 text-xl">問 AI</button>
+                </div>
+                <div class="pt-10 border-t border-gray-50 flex justify-center"><button id="viewDelBtn" class="text-red-400 font-bold text-lg p-4 opacity-60">刪除此項目</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm text-left">
+        <div class="card w-full p-6 h-[85vh] overflow-y-auto">
+            <h3 id="itTitle" class="font-black mb-4">編輯行程</h3>
+            <input type="hidden" id="itIdx">
+            <div class="grid grid-cols-2 gap-2">
+                <div><label class="text-[10px] font-bold text-gray-400">日期</label><input id="itDate" type="text" placeholder="05/23"></div>
+                <div><label class="text-[10px] font-bold text-gray-400">時間 (24H)</label><input id="itTime" type="time"></div>
+            </div>
+            <input id="itHeading" type="text" placeholder="標題"><input id="itLoc" type="text" placeholder="地址"><input id="itDrive" type="text" placeholder="銜接時間"><textarea id="itNote" class="h-32" placeholder="備註..."></textarea>
+            <div class="flex gap-2 mt-4"><button onclick="closeModal('itineraryModal')" class="flex-1 p-4 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveItinerary()" class="flex-1 muji-btn">儲存</button></div>
+        </div>
+    </div>
+
+    <div id="flightMainModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm text-left"><div class="card w-full p-6"><h3 class="font-black mb-4">航班資訊</h3><input id="m-airline" type="text" placeholder="航空"><input id="m-no" type="text" placeholder="航班"><input id="m-pnr" type="text" placeholder="PNR"><div class="grid grid-cols-2 gap-2"><input id="m-dep" type="text" placeholder="去程"><input id="m-arr" type="text" placeholder="回程"></div><div class="flex gap-2 mt-4"><button onclick="closeModal('flightMainModal')" class="flex-1 p-3 bg-gray-100 rounded-xl">取消</button><button onclick="saveFlightMain()" class="flex-1 muji-btn">儲存</button></div></div></div>
+    <div id="psgrModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm text-left"><div class="card w-full p-6"><h3 id="psgrTitle" class="font-black mb-4">旅客</h3><input type="hidden" id="psgrIdx"><input id="psgrName" type="text" placeholder="姓名"><input id="psgrSeat" type="text" placeholder="座位"><textarea id="psgrNote" placeholder="備註" class="h-24"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('psgrModal')" class="flex-1 p-3 bg-gray-100 rounded-xl">取消</button><button onclick="savePassenger()" class="flex-1 muji-btn">儲存</button></div></div></div>
+    <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-6 py-3 rounded-full opacity-0 transition-opacity z-[9999] pointer-events-none"></div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
+        const masterData = {
+            title: "名古屋親子悠閒行",
+            flightMain: { airline: "星宇航空", no: "JX830", pnr: "ABCDEF", dep: "05/23 10:00", arr: "05/23 14:00" },
+            passengers: [{ name: "薇那", seat: "22A", note: "一般餐", type: "adult" },{ name: "大人 B", seat: "22B", note: "一般餐", type: "adult" },{ name: "大人 C", seat: "22C", note: "一般餐", type: "adult" },{ name: "小孩 1", seat: "21A", note: "兒童餐", type: "kid" },{ name: "小孩 2", seat: "21B", note: "兒童餐", type: "kid" }],
+            itinerary: [
+                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場", driveInfo: "開車 45min", note: "辦理取車手續。" },
+                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", driveInfo: "", note: "吃味噌豬排！" },
+                { date: "05/24", time: "11:00", title: "樂高樂園", location: "金城ふ頭駐車場", driveInfo: "", note: "全家放電日。" },
+                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV Park", driveInfo: "", note: "看火車模型。" },
+                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "名古屋アンパンマン", driveInfo: "", note: "小孩最愛。" },
+                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "名古屋港水族館", driveInfo: "", note: "看虎鯨表演。" },
+                { date: "05/28", time: "11:00", title: "豐田技術館", location: "トヨタ產業紀念館", driveInfo: "", note: "室內遊樂。" },
+                { date: "05/29", time: "11:00", title: "還車 & 報到", location: "中部國際機場", driveInfo: "", note: "14:30 前要回機場。" }
+            ],
+            checkBring: [], checkBuy: [], expenses: [], payers: ["薇那", "大人A", "大人B"], rate: 0.21
+        };
+
+        let db = JSON.parse(JSON.stringify(masterData));
+
+        function switchPage(p) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('page-' + p);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('nav-active'));
+            const navBtn = document.getElementById('nav-' + p);
+            if (navBtn) navBtn.classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+
+        async function pullData() {
+            showSync(true);
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await res.json();
+                if(data && data.itinerary) db = data;
+                toast("管理者同步成功");
+            } catch (e) { toast("離線模式"); }
+            renderAll(); showSync(false);
+        }
+
+        async function pushData() {
+            showSync(true);
+            db.rate = parseFloat(document.getElementById('exRate').value) || 0.21;
+            try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){}
+            renderAll(); showSync(false);
+        }
+
+        function viewDetail(idx) {
+            const it = db.itinerary[idx];
+            document.getElementById('viewContent').innerHTML = `
+                <div class="text-left">
+                    <p class="text-[11px] font-black text-stone-300 tracking-widest mb-1">${it.date} ${it.time}</p>
+                    <h2 class="text-4xl font-black text-gray-800 leading-tight mb-2">${it.title}</h2>
+                    <p class="text-blue-500 font-bold text-sm mb-6"><i class="fa-solid fa-location-dot mr-1"></i> ${it.location}</p>
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-gray-600 leading-relaxed text-lg">${it.note ? it.note.replace(/\n/g, '<br>') : '無備註'}</div>
+                </div>`;
+            document.getElementById('viewMapBtn').onclick = () => window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(it.location), "_blank");
+            document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); };
+            document.getElementById('viewAiBtn').onclick = () => window.open("https://www.google.com/search?q=" + encodeURIComponent(it.location + " 附近親子美食"), "_blank");
+            document.getElementById('viewDelBtn').onclick = async () => { if(confirm("確定刪除？")) { db.itinerary.splice(idx, 1); await pushData(); closeModal('viewModal'); } };
+            openModal('viewModal');
+        }
+
+        function renderAll() {
+            const itList = document.getElementById('itineraryList');
+            if(!itList) return;
+            itList.innerHTML = '';
+            db.itinerary.forEach((it, idx) => {
+                itList.innerHTML += `<div onclick="viewDetail(${idx})" class="card p-6 border-l-[6px] border-stone-400 active:scale-98 transition-all text-left">
+                    <span class="text-[10px] font-black text-stone-300 tracking-widest">${it.date} ${it.time}</span>
+                    <h3 class="text-xl font-black text-gray-800 mt-1">${it.title}</h3>
+                    <p class="text-xs text-blue-500 mt-2 font-bold truncate"><i class="fa-solid fa-location-dot mr-1"></i> ${it.location}</p>
+                </div>`;
+                if(it.driveInfo && idx < db.itinerary.length - 1) {
+                    itList.innerHTML += `<div class="drive-line"><span class="bg-white text-blue-500 text-[10px] font-black px-3 py-1 rounded-full border border-blue-100">${it.driveInfo}</span></div>`;
+                }
+            });
+
+            const rate = db.rate || 0.21;
+            let total = 0; const payerTotals = {};
+            db.payers.forEach(p => payerTotals[p] = 0);
+            document.getElementById('expList').innerHTML = db.expenses.slice().reverse().map((e, idx) => {
+                total += e.cost; if(payerTotals.hasOwnProperty(e.payer)) payerTotals[e.payer] += e.cost;
+                const rIdx = db.expenses.length - 1 - idx;
+                return `<div class="card p-4 flex justify-between items-center text-left"><div><p class="font-black">${e.name}</p><p class="text-[10px] text-gray-400">NT$ ${Math.round(e.cost * rate).toLocaleString()} (${e.payer})</p></div><div class="flex items-center gap-3"><span class="font-black text-lg">¥${e.cost.toLocaleString()}</span><button onclick="delExp(${rIdx})" class="text-gray-200">×</button></div></div>`;
+            }).join('');
+            document.getElementById('totalSpend').innerText = total.toLocaleString();
+            document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
+            document.getElementById('payerStats').innerHTML = Object.entries(payerTotals).map(([p, val]) => `<div class="bg-white p-3 rounded-xl border border-gray-100 text-left"><p class="text-[9px] font-bold text-gray-400 uppercase">${p}</p><p class="font-black text-sm">¥${val.toLocaleString()}</p></div>`).join('');
+            
+            document.getElementById('expPayer').innerHTML = db.payers.map(p => `<option value="${p}">${p}</option>`).join('');
+            document.getElementById('payerManagerList').innerHTML = db.payers.map((p, idx) => `<div class="bg-stone-100 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">${p} <button onclick="delPayerName(${idx})">×</button></div>`).join('');
+            document.getElementById('f-no').innerText = db.flightMain.no;
+            document.getElementById('f-pnr').innerText = db.flightMain.pnr;
+            const psList = document.getElementById('passengerList'); psList.innerHTML = '';
+            db.passengers.forEach((p, idx) => { psList.innerHTML += `<div onclick="editPassenger(${idx})" class="flex-none w-28 p-4 bg-gray-50 rounded-2xl text-left"><p class="text-[9px] font-black text-stone-300 uppercase">${p.type}</p><h4 class="font-black text-sm truncate">${p.name}</h4><p class="text-[10px] font-mono text-blue-600 mt-1">${p.seat || '--'}</p></div>`; });
+            renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
+        }
+
+        async function updateWeather() {
+            const container = document.getElementById('weatherContainer');
+            container.innerHTML = '<p class="text-[10px] opacity-40 py-2">更新中...</p>';
+            try {
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,precipitation_probability,weathercode&forecast_days=1");
+                const data = await res.json();
+                const now = new Date().getHours();
+                let html = '';
+                for(let i=0; i<6; i++){
+                    const idx = (now + i) % 24;
+                    const temp = Math.round(data.hourly.temperature_2m[idx]);
+                    const prob = data.hourly.precipitation_probability[idx];
+                    const code = data.hourly.weathercode[idx];
+                    let icon = 'fa-cloud';
+                    if(code === 0) icon = 'fa-sun text-yellow-500';
+                    else if(code <= 3) icon = 'fa-cloud-sun text-gray-500';
+                    else if(code <= 67) icon = 'fa-cloud-showers-heavy text-blue-500';
+                    html += `<div class="weather-item"><p class="text-[9px] font-bold opacity-30">${idx}:00</p><i class="fa-solid ${icon} text-xl my-2"></i><p class="text-sm font-black">${temp}°</p><p class="text-[9px] opacity-40">${prob}%</p></div>`;
+                }
+                container.innerHTML = html;
+            } catch(e) { container.innerHTML = '失敗'; }
+        }
+
+        function openAddItinerary() { document.getElementById('itIdx').value = -1; document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); openModal('itineraryModal'); }
+        function openEditItinerary(idx) {
+            const it = db.itinerary[idx];
+            document.getElementById('itIdx').value = idx;
+            document.getElementById('itDate').value = it.date;
+            document.getElementById('itTime').value = it.time;
+            document.getElementById('itHeading').value = it.title;
+            document.getElementById('itLoc').value = it.location;
+            document.getElementById('itDrive').value = it.driveInfo || "";
+            document.getElementById('itNote').value = it.note;
+            openModal('itineraryModal');
+        }
+        async function saveItinerary() {
+            const idx = parseInt(document.getElementById('itIdx').value);
+            const data = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, driveInfo: document.getElementById('itDrive').value, note: document.getElementById('itNote').value };
+            if(idx === -1) db.itinerary.push(data); else db.itinerary[idx] = data;
+            db.itinerary.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+            closeModal('itineraryModal'); await pushData();
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        async function resetToDefault() { if(confirm("管理者救援：恢復預設 7 天行程？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); } }
+        async function addItem(type) { const inp = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); if(inp.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: inp.value, done: false}); inp.value = ''; await pushData(); } }
+        async function toggleCheck(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy)[idx].done = !(type === 'bring' ? db.checkBring : db.checkBuy)[idx].done; await pushData(); }
+        async function delItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy).splice(idx, 1); await pushData(); }
+        function renderCheckList(type, list, containerId) { document.getElementById(containerId).innerHTML = list.map((item, idx) => `<li class="flex items-center justify-between py-3"><div class="flex items-center gap-3 cursor-pointer" onclick="toggleCheck('${type}', ${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-green-500' : 'fa-square text-gray-100'} text-2xl"></i><span class="${item.done ? 'line-through text-gray-400' : 'font-bold'}">${item.text}</span></div><button onclick="delItem('${type}', ${idx})" class="text-gray-200">×</button></li>`).join(''); }
+        async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); await pushData(); } }
+        async function delExp(idx) { db.expenses.splice(idx, 1); await pushData(); }
+        async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); await pushData(); } document.getElementById('newPayer').value = ''; }
+        async function delPayerName(idx) { if(confirm("刪除？")) { db.payers.splice(idx, 1); await pushData(); } }
+        function calcTWD(val) { const rate = parseFloat(document.getElementById('exRate').value) || 0.21; document.getElementById('quickTWD').innerText = "≈ NT$ " + Math.round(val * rate).toLocaleString(); }
+        function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.remove('opacity-0'); setTimeout(() => t.classList.add('opacity-0'), 2500); }
+        function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
+        function copyPNR() { navigator.clipboard.writeText(db.flightMain.pnr); toast("已複製 PNR"); }
+        function editFlightMain() { document.getElementById('m-airline').value = db.flightMain.airline; document.getElementById('m-no').value = db.flightMain.no; document.getElementById('m-pnr').value = db.flightMain.pnr; document.getElementById('m-dep').value = db.flightMain.dep; document.getElementById('m-arr').value = db.flightMain.arr; openModal('flightMainModal'); }
+        async function saveFlightMain() { db.flightMain = { airline: document.getElementById('m-airline').value, no: document.getElementById('m-no').value, pnr: document.getElementById('m-pnr').value, dep: document.getElementById('m-dep').value, arr: document.getElementById('m-arr').value }; await pushData(); closeModal('flightMainModal'); }
+        function editPassenger(idx) { const p = db.passengers[idx]; document.getElementById('psgrIdx').value = idx; document.getElementById('psgrName').value = p.name; document.getElementById('psgrSeat').value = p.seat; document.getElementById('psgrNote').value = p.note; openModal('psgrModal'); }
+        async function savePassenger() { const idx = document.getElementById('psgrIdx').value; db.passengers[idx].name = document.getElementById('psgrName').value; db.passengers[idx].seat = document.getElementById('psgrSeat').value; db.passengers[idx].note = document.getElementById('psgrNote').value; await pushData(); closeModal('psgrModal'); }
+
+        async function init() { try { switchPage('itinerary'); await pullData(); updateWeather(); } catch(e){ renderAll(); } }
+        init();
+    </script>
+</body>
+</html>
