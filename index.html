@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v7.5</title>
+    <title>v7.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,11 +17,11 @@
         .page.active { display: block; }
         .nav-active { color: var(--n-miso) !important; font-weight: 900 !important; }
 
-        /* 清單修復：垂直對齊、絕對不換行、極窄間距 */
-        .list-row { display: flex; align-items: center; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid rgba(0,0,0,0.03); flex-wrap: nowrap !important; width: 100%; }
+        /* 清單 UI 修正：垂直居中、間距適中、按鈕不換行 */
+        .list-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.03); flex-wrap: nowrap !important; width: 100%; }
         .list-content { display: flex; align-items: center; gap: 12px; flex-grow: 1; min-width: 0; cursor: pointer; }
-        .list-text { font-weight: 700; color: #4B5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
-        .list-del-btn { flex-shrink: 0 !important; color: #D1D5DB; padding: 0 10px; font-size: 24px !important; height: 30px; display: flex; align-items: center; }
+        .list-text { font-weight: 700; color: #4B5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
+        .list-del-btn { flex-shrink: 0 !important; color: #D1D5DB; padding: 0 10px; font-size: 24px !important; height: 100%; display: flex; align-items: center; }
 
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; }
         .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.8); padding: 12px 5px; border-radius: 18px; border: 1px solid rgba(230,180,34,0.1); }
@@ -32,7 +32,7 @@
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
     <header class="p-6 pt-10 flex justify-between items-center text-left">
-        <h1 class="text-2xl font-black text-gray-800">名古屋旅程 <span class="bg-amber-400 text-[12px] px-2 py-1 rounded-lg ml-1">v7.5</span></h1>
+        <h1 class="text-2xl font-black text-gray-800">名古屋旅程 <span class="bg-amber-400 text-[12px] px-2 py-1 rounded-lg ml-1">v7.6</span></h1>
         <button onclick="pullData()" class="text-stone-300 text-3xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
@@ -41,19 +41,22 @@
             <div onclick="openFlightModal()" class="card p-5 border-t-8 border-amber-400 text-left">
                 <div class="flex justify-between items-center mb-3"><h2 class="font-black text-lg" id="f-airline">航空公司</h2><i class="fa-solid fa-chevron-right text-stone-200"></i></div>
                 <div class="space-y-2">
-                    <div><p class="text-blue-500 font-black uppercase text-[12px]">去程</p><p id="f-dep-line" class="font-bold text-gray-600">載入中...</p></div>
-                    <div><p class="text-red-500 font-black uppercase text-[12px]">回程</p><p id="f-arr-line" class="font-bold text-gray-600">載入中...</p></div>
+                    <div><p class="text-blue-500 font-black uppercase text-[12px]">去程</p><p id="f-dep-line" class="font-bold text-gray-600">讀取中...</p></div>
+                    <div><p class="text-red-500 font-black uppercase text-[12px]">回程</p><p id="f-arr-line" class="font-bold text-gray-600">讀取中...</p></div>
                 </div>
             </div>
             <div class="card p-4 bg-blue-50/50 border-none text-left">
                 <div class="flex justify-between items-center mb-3"><span class="font-black text-gray-500 uppercase text-[12px]">Weather (6H)</span>
-                    <div class="flex gap-2"><button onclick="window.open('https://weather.yahoo.co.jp/weather/jp/23/5110.html')" class="text-blue-500 font-bold text-[12px]">Yahoo</button><button onclick="updateWeather()" class="text-amber-600 font-bold text-[12px]">更新</button></div>
+                    <div class="flex gap-2">
+                        <button onclick="window.open('https://weather.yahoo.co.jp/weather/jp/23/5110.html')" class="text-blue-500 font-bold text-[12px]">Yahoo</button>
+                        <button onclick="updateWeather()" class="text-amber-600 font-bold text-[12px]">更新</button>
+                    </div>
                 </div>
-                <div id="weatherContainer" class="weather-scroll"><p class="w-full text-center opacity-40">待更新...</p></div>
+                <div id="weatherContainer" class="weather-scroll"><p class="w-full text-center opacity-40">請按更新...</p></div>
             </div>
             <button onclick="openAddItinerary()" class="muji-btn mb-4">＋ 新增行程</button>
-            <div id="itineraryList" class="space-y-0"></div>
-            <button onclick="resetToDefault()" class="w-full py-4 mt-20 text-stone-300 font-bold border border-stone-100 rounded-2xl">🆘 恢復行程備份</button>
+            <div id="itineraryList" class="space-y-0 text-left"></div>
+            <button onclick="resetToDefault()" class="w-full py-4 mt-20 text-stone-600 font-bold border-2 border-stone-200 rounded-2xl bg-stone-100">🆘 恢復 7 天備份行程</button>
         </div>
 
         <div id="page-items" class="page text-left">
@@ -72,12 +75,12 @@
 
         <div id="page-budget" class="page text-left">
             <div class="card p-8 bg-stone-800 text-white text-center mb-4"><div class="text-3xl font-black">¥ <span id="totalSpend">0</span></div><p class="opacity-50 mt-1 font-bold">≈ NT$ <span id="totalTWD">0</span></p></div>
-            <div id="payerStats" class="grid grid-cols-3 gap-2 mb-4"></div>
-            <div class="card p-5"><input id="expName" type="text" placeholder="項目"><input id="expCost" type="number" placeholder="日圓(JPY)"><select id="expPayer"></select><button onclick="addExp()" class="muji-btn mt-2">紀錄支出</button></div>
+            <div id="payerStats" class="grid grid-cols-3 gap-2 mb-4 text-center"></div>
+            <div class="card p-5"><input id="expName" type="text" placeholder="品項"><input id="expCost" type="number" placeholder="日圓(JPY)"><select id="expPayer"></select><button onclick="addExp()" class="muji-btn mt-2">紀錄支出</button></div>
             <div id="expList" class="space-y-2 mt-4"></div>
         </div>
 
-        <div id="page-tools" class="page text-left"><h2 class="font-black mb-6 text-xl">設定</h2><div class="card p-6">名單管理<div class="flex gap-2 mt-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2 mb-6"></div>匯率 (JPY=TWD)<input id="exRate" type="number" step="0.01" value="0.21" onchange="saveSettingsOnly()" class="text-amber-600 font-bold"></div></div>
+        <div id="page-tools" class="page text-left"><h2 class="font-black mb-6 text-xl">設定</h2><div class="card p-6">名單管理<div class="flex gap-2 mt-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2 mb-6 text-center"></div>匯率 (JPY=TWD)<input id="exRate" type="number" step="0.01" value="0.21" onchange="saveSettingsOnly()" class="text-amber-600 font-bold"></div></div>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-amber-50 flex justify-around py-4 pb-10 z-50">
@@ -87,4 +90,97 @@
         <button onclick="switchPage('tools')" id="nav-tools" class="text-stone-300"><i class="fa-solid fa-user-gear text-2xl"></i></button>
     </nav>
 
-    <div id="flightModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-md text-left"><div class="card w-full p-6 h-[85vh] overflow-y-auto border-t-8 border-amber-400"><div class="flex justify-between items-center mb-6"><h3>航班與旅客</h3><button onclick="closeModal('flightModal')" class="text-4xl">×</button></div>
+    <div id="flightModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-md text-left"><div class="card w-full p-6 h-[85vh] overflow-y-auto border-t-8 border-amber-400 text-left"><div class="flex justify-between items-center mb-6"><h3>航班詳情</h3><button onclick="closeModal('flightModal')" class="text-4xl">×</button></div><div id="psgrCardList" class="space-y-3"></div></div></div>
+    <div id="psgrEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400] text-left"><div class="card w-full p-6 h-[80vh] overflow-y-auto"><h3>編輯旅客</h3><input id="psgr-name" type="text"><input id="psgr-dep-seat" type="text" placeholder="去程座號"><input id="psgr-arr-seat" type="text" placeholder="回程座號"><button onclick="savePassengerDetails()" class="muji-btn">確定</button></div></div>
+    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] text-left"><div class="card w-full p-6 h-[85vh] overflow-y-auto"><h3>編輯行程</h3><input type="hidden" id="itIdx"><input id="itDate" type="text"><input id="itTime" type="time"><input id="itHeading" type="text"><input id="itLoc" type="text"><textarea id="itNote" style="width:100%;height:100px;border:1px solid #ddd;border-radius:16px;"></textarea><button onclick="saveItinerary()" class="muji-btn">儲存</button></div></div>
+    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full opacity-0 transition-opacity z-[9999]"></div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
+        const DB_KEY = 'vina_travel_final';
+        const masterData = {
+            flightMain: { airline: "星宇航空", depDate: "05/23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", depFrom: "TPE", depTo: "NGO", arrDate: "05/29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30", arrFrom: "NGO", arrTo: "TPE" },
+            passengers: Array(5).fill().map((_, i) => ({ name: "旅客 " + (i+1), dep: {pnr:"ABCDEF", seat:"--", meal:"一般餐"}, ret: {pnr:"ABCDEF", seat:"--", meal:"一般餐"} })),
+            itinerary: [{ date: "05/23", time: "15:30", title: "抵達名古屋", location: "中部國際機場(NGO)", note: "啟程" }],
+            checkBring: [{text:"護照", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
+        };
+        let db = JSON.parse(JSON.stringify(masterData));
+        let activePsgrIdx = -1;
+
+        function switchPage(p) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.getElementById('page-' + p).classList.add('active');
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('nav-active'));
+            document.getElementById('nav-' + p).classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+        function init() { const local = localStorage.getItem(DB_KEY); if (local) db = JSON.parse(local); renderAll(); }
+        async function pullData() { showSync(true); try { const res = await fetch(GOOGLE_SCRIPT_URL); const data = await res.json(); if(data && data.itinerary) { db = data; saveLocal(); renderAll(); toast("同步成功"); } } catch (e) { toast("同步失敗"); } showSync(false); }
+        async function pushData() { showSync(true); saveLocal(); renderAll(); try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} showSync(false); }
+        function saveLocal() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+        function renderAll() {
+            const f = db.flightMain;
+            document.getElementById('f-airline').innerText = f.airline || "星宇航空";
+            document.getElementById('f-dep-line').innerText = (f.depDate || "05/23") + ' ' + (f.depNo || "JX830");
+            document.getElementById('f-arr-line').innerText = (f.arrDate || "05/29") + ' ' + (f.arrNo || "JX831");
+            const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
+            db.itinerary.forEach((it, idx) => {
+                itList.innerHTML += `<div class="card p-6 border-l-[8px] border-amber-400 active:scale-98 transition-all">
+                    <span class="font-black text-stone-400">${it.date} ${it.time}</span>
+                    <h3 class="font-black text-gray-800 mt-1">${it.title}</h3>
+                    <p class="text-blue-500 font-bold mt-1">${it.location}</p>
+                </div>`;
+            });
+            const rate = db.rate || 0.21; let total = 0; const payerTotals = {}; db.payers.forEach(p => payerTotals[p] = 0);
+            document.getElementById('expList').innerHTML = db.expenses.slice().reverse().map((e, idx) => {
+                total += e.cost; if(payerTotals.hasOwnProperty(e.payer)) payerTotals[e.payer] += e.cost;
+                return `<div class="card p-4 flex justify-between items-center"><div><p class="font-black">${e.name}</p><p class="text-gray-400">${Math.round(e.cost * rate).toLocaleString()} • ${e.payer}</p></div><div class="flex items-center gap-3"><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span><button onclick="delExp(${db.expenses.length - 1 - idx})">×</button></div></div>`;
+            }).join('');
+            document.getElementById('totalSpend').innerText = total.toLocaleString();
+            document.getElementById('payerStats').innerHTML = Object.entries(payerTotals).map(([p, val]) => `<div class="bg-white p-2 rounded-2xl border text-center"><p class="text-stone-400 text-[10px] uppercase">${p}</p><p class="font-black text-[13px]">¥${val.toLocaleString()}</p></div>`).join('');
+            document.getElementById('expPayer').innerHTML = db.payers.map(p => `<option value="${p}">${p}</option>`).join('');
+            document.getElementById('payerManagerList').innerHTML = db.payers.map((p, idx) => `<div class="bg-stone-200 px-4 py-1 rounded-full flex items-center gap-2 mb-2 mr-2">${p} <button onclick="delPayerName(${idx})">×</button></div>`).join('');
+            renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
+        }
+        function renderCheckList(type, list, containerId) { 
+            document.getElementById(containerId).innerHTML = list.map((item, idx) => `<div class="list-row">
+                <div class="list-content" onclick="toggleCheck('${type}',${idx})">
+                    <i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-stone-100'} text-3xl flex-shrink-0"></i>
+                    <span class="list-text ${item.done ? 'line-through text-stone-300' : ''}">${item.text}</span>
+                </div>
+                <button class="list-del-btn" onclick="delItem('${type}',${idx})">×</button>
+            </div>`).join(''); 
+        }
+        async function updateWeather() {
+            const container = document.getElementById('weatherContainer');
+            container.innerHTML = '<p class="w-full text-center opacity-40">連線中...</p>';
+            try {
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1");
+                const data = await res.json();
+                const now = new Date().getHours();
+                let html = '';
+                for(let i=0; i<6; i++){
+                    const tIdx = (now + i) % 24; const temp = Math.round(data.hourly.temperature_2m[tIdx]);
+                    html += `<div class="weather-item"><p class="font-black opacity-30">${tIdx}:00</p><i class="fa-solid fa-cloud text-2xl my-2"></i><p class="font-black">${temp}°</p></div>`;
+                }
+                container.innerHTML = html;
+            } catch(e) { container.innerHTML = '<p class="text-red-500 w-full text-center">連線失敗</p>'; }
+        }
+        function openFlightModal() { renderPassengerCards(); openModal('flightModal'); }
+        function renderPassengerCards() { document.getElementById('psgrCardList').innerHTML = db.passengers.map((p, idx) => `<div onclick="openPsgrEdit(${idx})" class="card p-4 border active:bg-amber-50 text-left"><p class="font-black text-amber-600 mb-1">${p.name}</p><div class="text-gray-400">去: ${p.dep.seat} / 回: ${p.ret.seat}</div></div>`).join(''); }
+        function openPsgrEdit(idx) { activePsgrIdx = idx; const p = db.passengers[idx]; document.getElementById('psgr-name').value = p.name; document.getElementById('psgr-dep-seat').value = p.dep.seat; document.getElementById('psgr-arr-seat').value = p.ret.seat; openModal('psgrEditModal'); }
+        async function savePassengerDetails() { const idx = activePsgrIdx; db.passengers[idx].name = document.getElementById('psgr-name').value; db.passengers[idx].dep.seat = document.getElementById('psgr-dep-seat').value; db.passengers[idx].ret.seat = document.getElementById('psgr-arr-seat').value; closeModal('psgrEditModal'); await pushData(); }
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        async function addItem(type) { const inp = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); if(inp.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: inp.value, done: false}); inp.value = ''; await pushData(); } }
+        async function toggleCheck(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy)[idx].done = !(type === 'bring' ? db.checkBring : db.checkBuy)[idx].done; await pushData(); }
+        async function delItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy).splice(idx, 1); await pushData(); }
+        async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); document.getElementById('expName').value = ''; document.getElementById('expCost').value = ''; await pushData(); } }
+        async function delExp(idx) { db.expenses.splice(idx, 1); await pushData(); }
+        async function resetToDefault() { if(confirm("確定恢復備份？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); } }
+        function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
+        function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
+        init();
+    </script>
+</body>
+</html>
