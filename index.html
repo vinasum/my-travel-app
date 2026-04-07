@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>名古屋旅程 v4.5.1 管理者中心</title>
+    <title>名古屋旅程 v4.6 管理者結算版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,14 +12,15 @@
         .card { background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 16px; overflow: hidden; }
         .weather-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; }
         .weather-item { flex: 0 0 65px; text-align: center; }
-        .muji-btn { background-color: #8D6E63; color: white; padding: 14px; border-radius: 14px; font-weight: bold; width: 100%; transition: 0.2s; text-align: center; cursor: pointer; display: block; }
-        .muji-btn:active { transform: scale(0.96); }
-        .page { display: none; animation: slideIn 0.3s ease-out; padding-bottom: 120px; }
+        .muji-btn { background-color: #8D6E63; color: white; padding: 14px; border-radius: 14px; font-weight: bold; width: 100%; text-align: center; cursor: pointer; display: block; }
+        .page { display: none; animation: slideIn 0.3s ease-out; padding-bottom: 150px; }
         .page.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
         .nav-active { color: #8D6E63 !important; }
         #syncBar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #E6B422; z-index: 9999; transform: scaleX(0); transition: transform 0.4s; transform-origin: left; }
         input, select, textarea { width: 100%; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px; margin-bottom: 10px; outline: none; background: #fff; text-align: left !important; font-size: 16px !important; }
+        .drive-line { border-left: 2px dashed #CBD5E1; margin-left: 30px; padding: 10px 0 25px 25px; position: relative; }
+        .drive-line::before { content: "\f1b9"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); background: #F8F9FA; color: #CBD5E1; padding: 2px 0; }
     </style>
 </head>
 <body class="max-w-md mx-auto min-h-screen relative">
@@ -28,79 +29,63 @@
 
     <header class="p-6 pt-10 flex justify-between items-center">
         <div>
-            <h1 id="appTitle" class="text-3xl font-black text-gray-800 tracking-tighter">名古屋旅程</h1>
+            <h1 class="text-3xl font-black text-gray-800 tracking-tighter">名古屋旅程</h1>
             <p id="syncStatus" class="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-widest"><i class="fa-solid fa-cloud mr-1 text-[#E6B422]"></i> 管理者同步中</p>
         </div>
-        <button onclick="pullData()" class="text-brown-600 text-2xl p-2 active:rotate-180 transition-transform duration-500"><i class="fa-solid fa-arrows-rotate"></i></button>
+        <button onclick="pullData()" class="text-brown-600 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
     <main class="px-5">
         <div id="page-itinerary" class="page active">
-            <div class="card p-5 border-t-4 border-[#E6B422] mb-4">
+            <div id="flightCard" class="card p-5 border-t-4 border-[#E6B422] mb-4">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="bg-stone-800 text-white text-[9px] px-2 py-0.5 rounded font-bold">FLIGHT STATUS</span>
+                    <span class="bg-stone-800 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase">Flight</span>
                     <button onclick="editFlightMain()" class="text-gray-300 text-sm"><i class="fa-solid fa-pen-to-square"></i></button>
                 </div>
                 <div class="flex justify-between items-end">
-                    <div>
-                        <h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2>
-                        <p id="f-airline" class="text-[11px] text-gray-400 font-bold uppercase">預約資訊</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[9px] text-gray-400 font-bold mb-1">PNR CODE</p>
-                        <button onclick="copyPNR()" id="f-pnr" class="text-xl font-mono font-black text-blue-600 bg-blue-50 px-2 py-1 rounded">--</button>
-                    </div>
-                </div>
-                <div class="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-gray-50">
-                    <div><p class="text-[9px] text-gray-400 font-bold uppercase">Depart</p><p id="f-dep" class="font-black text-sm">--</p></div>
-                    <div class="text-center text-[#E6B422] self-center"><i class="fa-solid fa-plane-arrival text-lg"></i></div>
-                    <div class="text-right"><p class="text-[9px] text-gray-400 font-bold uppercase">Arrive</p><p id="f-arr" class="font-black text-sm">--</p></div>
+                    <div><h2 id="f-no" class="text-3xl font-black tracking-tighter">--</h2><p id="f-airline" class="text-[11px] text-gray-400 font-bold">航空預約</p></div>
+                    <div class="text-right"><p class="text-[9px] text-gray-400 font-bold mb-1 uppercase">PNR</p><button onclick="copyPNR()" id="f-pnr" class="text-xl font-mono font-black text-blue-600 bg-blue-50 px-2 rounded">--</button></div>
                 </div>
             </div>
 
-            <div class="flex overflow-x-auto gap-3 pb-4 mb-4" style="scrollbar-width: none;">
-                <div id="passengerList" class="flex gap-3"></div>
-            </div>
+            <div class="flex overflow-x-auto gap-3 pb-4 mb-4 no-scrollbar" style="scrollbar-width: none;"><div id="passengerList" class="flex gap-3"></div></div>
 
             <div class="card p-5 bg-stone-900 text-white mb-6">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-[10px] font-bold opacity-50 tracking-widest uppercase">Nagoya 6H Forecast</span>
-                    <button onclick="updateWeather()" class="text-[10px] bg-white/10 px-2 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i>重整</button>
-                </div>
-                <div id="weatherContainer" class="weather-scroll text-left">
-                    <p class="text-xs opacity-40 py-2">點擊重整獲取氣象...</p>
-                </div>
+                <div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold opacity-50 tracking-widest uppercase">Nagoya 6H Forecast</span><button onclick="updateWeather()" class="text-[10px] bg-white/10 px-2 py-1 rounded-full"><i class="fa-solid fa-rotate"></i></button></div>
+                <div id="weatherContainer" class="weather-scroll text-left"></div>
             </div>
 
-            <div id="itineraryList" class="space-y-4"></div>
+            <button onclick="openAddItinerary()" class="muji-btn mb-6 bg-stone-700 shadow-lg"><i class="fa-solid fa-plus mr-2"></i>新增行程項目</button>
+
+            <div id="itineraryList" class="space-y-0"></div>
         </div>
 
         <div id="page-items" class="page">
-            <h2 class="text-2xl font-black mb-6 text-left">物品清單</h2>
+            <h2 class="text-2xl font-black mb-6">物品清單</h2>
             <div class="card p-5 border-t-4 border-blue-500 mb-6">
-                <h3 class="font-black text-blue-600 mb-4"><i class="fa-solid fa-suitcase mr-2"></i>要攜帶的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="例：護照、尿布..."><button onclick="addItem('bring')" class="muji-btn w-auto px-4 bg-blue-600">+</button></div>
-                <ul id="bringList" class="divide-y divide-gray-50 text-left"></ul>
+                <h3 class="font-black text-blue-600 mb-4">要攜帶的物品</h3>
+                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="例：駕照譯本..."><button onclick="addItem('bring')" class="muji-btn w-auto px-4 bg-blue-600">+</button></div>
+                <ul id="bringList" class="divide-y divide-gray-50"></ul>
             </div>
             <div class="card p-5 border-t-4 border-red-500">
-                <h3 class="font-black text-red-600 mb-4"><i class="fa-solid fa-bag-shopping mr-2"></i>要購買的物品</h3>
-                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="例：合利他命、樂高..."><button onclick="addItem('buy')" class="muji-btn w-auto px-4 bg-red-600">+</button></div>
-                <ul id="buyList" class="divide-y divide-gray-50 text-left"></ul>
+                <h3 class="font-black text-red-600 mb-4">要購買的物品</h3>
+                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="例：樂高..."><button onclick="addItem('buy')" class="muji-btn w-auto px-4 bg-red-600">+</button></div>
+                <ul id="buyList" class="divide-y divide-gray-50"></ul>
             </div>
         </div>
 
         <div id="page-budget" class="page">
             <div class="card p-8 bg-stone-800 text-white text-center mb-6">
-                <p class="text-[10px] opacity-40 mb-1 font-bold tracking-widest uppercase">Total Expenditure</p>
+                <p class="text-[10px] opacity-40 mb-1 font-bold uppercase tracking-widest">Grand Total</p>
                 <div class="text-4xl font-black tracking-tighter">¥ <span id="totalSpend">0</span></div>
                 <div class="text-sm opacity-50 mt-1 font-bold">≈ NT$ <span id="totalTWD">0</span></div>
             </div>
+
+            <div id="payerStats" class="grid grid-cols-2 gap-3 mb-6"></div>
+            
             <div class="card p-6">
                 <input id="expName" type="text" placeholder="品項名稱">
-                <div class="relative">
-                    <input id="expCost" type="number" placeholder="日圓 (JPY)" oninput="calcTWD(this.value)">
-                    <div id="quickTWD" class="absolute right-3 top-3 text-[10px] text-gray-400 font-bold bg-gray-50 px-1 rounded">≈ NT$ 0</div>
-                </div>
+                <div class="relative"><input id="expCost" type="number" placeholder="日圓 (JPY)" oninput="calcTWD(this.value)"><div id="quickTWD" class="absolute right-3 top-3 text-[10px] text-gray-400 font-bold bg-gray-50 px-1 rounded">≈ NT$ 0</div></div>
                 <select id="expPayer" class="bg-gray-50"></select>
                 <button onclick="addExp()" class="muji-btn mt-2 shadow-lg">紀錄支出</button>
             </div>
@@ -108,17 +93,19 @@
         </div>
 
         <div id="page-tools" class="page">
-            <h2 class="text-2xl font-black mb-6">管理者中心</h2>
-            <div class="card p-6 text-left">
-                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase tracking-widest">匯率設定</h3>
-                <div class="mb-6">
-                    <label class="text-[11px] font-black text-gray-500 ml-1">1 JPY = ? TWD</label>
-                    <input id="exRate" type="number" step="0.001" value="0.21" onchange="pushData()" class="mt-1 font-bold text-lg">
-                </div>
+            <h2 class="text-2xl font-black mb-6">管理者設定</h2>
+            <div class="card p-6">
+                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase tracking-widest">成人名單管理 (付款人)</h3>
+                <div class="flex gap-2 mb-6"><input id="newPayer" type="text" placeholder="輸入姓名"><button onclick="addPayerName()" class="muji-btn w-auto px-4 bg-stone-600">+</button></div>
+                <div id="payerManagerList" class="flex flex-wrap gap-2 mb-6"></div>
+                
                 <hr class="my-6 border-gray-50">
-                <h3 class="font-bold mb-4 text-red-400 text-xs uppercase tracking-widest">管理者救援區</h3>
-                <button onclick="resetToDefault()" class="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black text-sm mb-2 border border-red-100">強制恢復 7 天預設行程</button>
-                <p class="text-[10px] text-gray-400 mb-6">點擊後會用 5/23 - 5/29 完整計畫覆蓋雲端。</p>
+                <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase tracking-widest">匯率設定</h3>
+                <input id="exRate" type="number" step="0.001" value="0.21" onchange="pushData()" class="font-bold text-lg">
+                
+                <hr class="my-6 border-gray-50">
+                <h3 class="font-bold mb-4 text-red-400 text-xs uppercase tracking-widest">管理者救援</h3>
+                <button onclick="resetToDefault()" class="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black text-sm mb-4 border border-red-100">強制恢復 7 天行程</button>
                 <button onclick="clearAllData()" class="w-full text-gray-300 text-[10px] font-bold">清空雲端資料</button>
             </div>
         </div>
@@ -131,109 +118,50 @@
         <button onclick="switchPage('tools')" id="nav-tools" class="flex flex-col items-center text-gray-300"><i class="fa-solid fa-sliders text-xl"></i><span class="text-[10px] mt-1 font-bold">設定</span></button>
     </nav>
 
-    <div id="flightMainModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm">
-        <div class="card w-full p-6"><h3 class="font-black mb-4">航班主資訊</h3><input id="m-airline" type="text" placeholder="航空公司"><input id="m-no" type="text" placeholder="班機號碼"><input id="m-pnr" type="text" placeholder="PNR"><div class="grid grid-cols-2 gap-2"><input id="m-dep" type="text" placeholder="起飛時間"><input id="m-arr" type="text" placeholder="抵達時間"></div><div class="flex gap-2 mt-4"><button onclick="closeModal('flightMainModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveFlightMain()" class="flex-1 muji-btn">儲存</button></div></div>
-    </div>
-    <div id="psgrModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm">
-        <div class="card w-full p-6"><h3 id="psgrTitle" class="font-black mb-4">旅客</h3><input type="hidden" id="psgrIdx"><input id="psgrName" type="text" placeholder="姓名"><input id="psgrSeat" type="text" placeholder="座位"><textarea id="psgrNote" placeholder="餐點/個人備註" class="h-24"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('psgrModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="savePassenger()" class="flex-1 muji-btn">儲存</button></div></div>
-    </div>
     <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm">
-        <div class="card w-full p-6 h-[80vh] overflow-y-auto"><h3 id="itTitle" class="font-black mb-4">編輯行程</h3><input type="hidden" id="itIdx"><div class="grid grid-cols-2 gap-2"><input id="itDate" type="text" placeholder="日期"><input id="itTime" type="time"></div><input id="itHeading" type="text" placeholder="標題"><input id="itLoc" type="text" placeholder="導航至(停車場/地址)"><textarea id="itNote" placeholder="管理者備註..." class="h-40"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('itineraryModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveItinerary()" class="flex-1 muji-btn">儲存</button></div><button onclick="deleteItinerary()" class="w-full text-red-300 text-[10px] mt-6">刪除行程</button></div>
+        <div class="card w-full p-6 h-[85vh] overflow-y-auto"><h3 id="itTitle" class="font-black mb-4">編輯行程</h3><input type="hidden" id="itIdx"><div class="grid grid-cols-2 gap-2"><input id="itDate" type="text" placeholder="日期 (例: 05/23)"><input id="itTime" type="time"></div><input id="itHeading" type="text" placeholder="標題"><input id="itLoc" type="text" placeholder="地點/停車場座標"><input id="itDrive" type="text" placeholder="銜接路程 (例: 開車 40min)"><textarea id="itNote" placeholder="備註..." class="h-32"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('itineraryModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveItinerary()" class="flex-1 muji-btn">儲存</button></div><button id="delItBtn" onclick="deleteItinerary()" class="w-full text-red-300 text-[10px] mt-6">刪除行程</button></div>
     </div>
+    <div id="flightMainModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] shadow-2xl backdrop-blur-sm"><div class="card w-full p-6"><h3 class="font-black mb-4 text-left">航班主資訊</h3><input id="m-airline" type="text" placeholder="航空公司"><input id="m-no" type="text" placeholder="班機號碼"><input id="m-pnr" type="text" placeholder="PNR"><div class="grid grid-cols-2 gap-2"><input id="m-dep" type="text" placeholder="起飛時間"><input id="m-arr" type="text" placeholder="抵達時間"></div><div class="flex gap-2 mt-4"><button onclick="closeModal('flightMainModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="saveFlightMain()" class="flex-1 muji-btn">儲存</button></div></div></div>
+    <div id="psgrModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-sm"><div class="card w-full p-6"><h3 id="psgrTitle" class="font-black mb-4 text-left">旅客編輯</h3><input type="hidden" id="psgrIdx"><input id="psgrName" type="text" placeholder="姓名"><input id="psgrSeat" type="text" placeholder="座位"><textarea id="psgrNote" placeholder="餐點備註" class="h-24"></textarea><div class="flex gap-2 mt-4"><button onclick="closeModal('psgrModal')" class="flex-1 p-3 bg-gray-100 rounded-xl font-bold">取消</button><button onclick="savePassenger()" class="flex-1 muji-btn">儲存</button></div></div></div>
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-6 py-3 rounded-full opacity-0 transition-opacity z-[9999] pointer-events-none"></div>
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
         
-        // --- 核心：5/23 - 5/29 完整名古屋精華資料 ---
         const masterData = {
             title: "名古屋親子悠閒行",
-            flightMain: { airline: "航空公司", no: "JX830", pnr: "ABCDEF", dep: "05/23 10:00", arr: "05/23 14:00" },
-            passengers: [
-                { name: "薇那(管理者)", seat: "22A", note: "一般餐", type: "adult" },
-                { name: "成人 B", seat: "22B", note: "一般餐", type: "adult" },
-                { name: "成人 C", seat: "22C", note: "一般餐", type: "adult" },
-                { name: "小孩 1", seat: "21A", note: "兒童餐", type: "kid" },
-                { name: "小孩 2", seat: "21B", note: "兒童餐", type: "kid" }
-            ],
+            flightMain: { airline: "航空公司", no: "JX830", pnr: "ABCDEF", dep: "10:00", arr: "14:00" },
+            passengers: [{ name: "薇那", seat: "22A", note: "一般餐", type: "adult" },{ name: "成人 2", seat: "22B", note: "一般餐", type: "adult" },{ name: "成人 3", seat: "22C", note: "一般餐", type: "adult" },{ name: "小孩 1", seat: "21A", note: "兒童餐", type: "kid" },{ name: "小孩 2", seat: "21B", note: "兒童餐", type: "kid" }],
             itinerary: [
-                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場(取車點)", note: "辦理取車手續。檢查：日文譯本、駕照、小孩增高墊。" },
-                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", note: "晚餐推：名古屋特色味噌豬排（我們吃豬肉！）。附近有 Times 榮第 4 停車場。" },
-                { date: "05/24", time: "11:00", title: "悠閒出發 (Legoland)", location: "金城ふ頭駐車場", note: "導航直接設：金城埠頭立體停車場。步行 5min 抵達樂高樂園。" },
-                { date: "05/24", time: "13:00", title: "名古屋樂高樂園", location: "LEGOLAND Japan", note: "4.5 歲小孩體力極限，適時休息。門口有 Maker's Pier 餐廳區。" },
-                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV and Railway Park", note: "室內吹冷氣看火車。有巨大鐵道模型，小孩會瘋狂。" },
-                { date: "05/25", time: "17:00", title: "AEON Mall 名古屋港明", location: "LaLaport Nagoya Minato AQULS", note: "停車位超多。適合吃晚餐與最後採買。" },
-                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "名古屋アンパンマン樂園", note: "導航：長島渡假村停車場。小孩最期待的點！" },
-                { date: "05/26", time: "16:00", title: "Jazz Dream Outlet", location: "三井長島 Outlet", note: "就在麵包超人隔壁。大人可以輪流換手去逛街。" },
-                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "名古屋港水族館停車場", note: "必看：虎鯨、海豚表演。全室內，不用怕下雨或曬太陽。" },
-                { date: "05/27", time: "15:00", title: "Sea Train Land", location: "シートレインランド", note: "水族館旁免門票樂園。玩摩天輪看港區美景。" },
-                { date: "05/28", time: "11:00", title: "豐田技術館 or 動物園", location: "トヨタ產業技術紀念館", note: "雨備：技術館（室內超大遊樂區）。晴天：東山動植物園。" },
-                { date: "05/29", time: "11:00", title: "早午餐 & 機場還車", location: "中部國際機場(還車點)", note: "悠閒吃早餐，14:00 前完成還車與報到。16:35 起飛。" }
+                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場(取車點)", driveInfo: "開車 45min", note: "辦理取車手續。檢查：日文譯本、駕照、小孩增高墊。" },
+                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", driveInfo: "", note: "吃味噌豬排！" }
             ],
-            checkBring: [{text: "日文譯本", done: false}, {text: "護照", done: false}, {text: "小孩推車", done: false}],
-            checkBuy: [{text: "樂高積木", done: false}, {text: "藥妝", done: false}],
-            expenses: [],
-            payers: ["薇那", "成人B", "成人C"],
-            rate: 0.21
+            checkBring: [], checkBuy: [], expenses: [],
+            payers: ["薇那", "大人A", "大人B"], rate: 0.21
         };
 
         let db = JSON.parse(JSON.stringify(masterData));
 
-        // --- 同步邏輯 ---
         async function pullData() {
             showSync(true);
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
-                if(data && data.itinerary && data.itinerary.length > 0) db = data;
-                toast("雲端同步成功");
-            } catch (e) { toast("目前為離線模式"); }
+                if(data && data.itinerary) db = data;
+                toast("管理者同步成功");
+            } catch (e) { toast("離線模式"); }
             renderAll(); showSync(false);
         }
+
         async function pushData() {
             showSync(true);
             db.rate = parseFloat(document.getElementById('exRate').value) || 0.21;
             try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e) {}
             renderAll(); showSync(false);
         }
-        async function resetToDefault() { if(confirm("管理者警告：這會把 5/23 - 5/29 的完整計畫蓋掉雲端目前內容。確定？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); toast("行程已恢復！"); } }
 
-        // --- 氣象 (6H) ---
-        async function updateWeather() {
-            const container = document.getElementById('weatherContainer');
-            container.innerHTML = '<p class="text-[10px] opacity-40 py-2">獲取預報中...</p>';
-            try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,precipitation_probability&forecast_days=1`);
-                const data = await res.json();
-                const now = new Date().getHours();
-                let html = '';
-                for(let i=0; i<6; i++){
-                    const idx = (now + i) % 24;
-                    const temp = Math.round(data.hourly.temperature_2m[idx]);
-                    const prob = data.hourly.precipitation_probability[idx];
-                    html += `<div class="weather-item"><p class="text-[9px] font-bold opacity-30">${idx}:00</p><p class="text-lg font-black">${temp}°</p><p class="text-[9px] ${prob > 30 ? 'text-blue-500 font-bold' : 'opacity-30'}"><i class="fa-solid fa-droplet text-[7px]"></i> ${prob}%</p></div>`;
-                }
-                container.innerHTML = html; toast("氣象已更新");
-            } catch(e) { container.innerHTML = '連線失敗'; }
-        }
-
-        // --- 渲染渲染 ---
         function renderAll() {
-            document.getElementById('f-no').innerText = db.flightMain.no;
-            document.getElementById('f-pnr').innerText = db.flightMain.pnr;
-            document.getElementById('f-dep').innerText = db.flightMain.dep;
-            document.getElementById('f-arr').innerText = db.flightMain.arr;
-            document.getElementById('f-airline').innerText = db.flightMain.airline;
-
-            const psList = document.getElementById('passengerList'); psList.innerHTML = '';
-            db.passengers.forEach((p, idx) => {
-                psList.innerHTML += `<div onclick="editPassenger(${idx})" class="flex-none w-28 p-4 bg-gray-50 border border-gray-100 rounded-2xl">
-                    <p class="text-[9px] font-black text-stone-300 mb-1 tracking-tighter">${p.type.toUpperCase()}</p>
-                    <h4 class="font-black text-sm truncate">${p.name}</h4>
-                    <p class="text-[10px] font-mono font-bold text-blue-600 mt-1">${p.seat || '--'}</p>
-                </div>`;
-            });
-
+            // 1. 行程渲染 (包含路程銜接)
             const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
             db.itinerary.forEach((it, idx) => {
                 itList.innerHTML += `<div onclick="openEditItinerary(${idx})" class="card p-6 border-l-[6px] border-stone-400 active:bg-gray-50 transition-colors">
@@ -241,66 +169,139 @@
                     <h3 class="text-xl font-black text-gray-800 mt-1">${it.title}</h3>
                     <p class="text-xs text-blue-500 mt-2 font-bold"><i class="fa-solid fa-location-dot mr-1"></i> ${it.location}</p>
                 </div>`;
+                if(it.driveInfo && idx < db.itinerary.length - 1) {
+                    itList.innerHTML += `<div class="drive-line"><span class="bg-blue-50 text-blue-600 text-[10px] font-black px-3 py-1 rounded-full border border-blue-100">${it.driveInfo}</span></div>`;
+                }
             });
 
-            renderCheckList('bring', db.checkBring, 'bringList');
-            renderCheckList('buy', db.checkBuy, 'buyList');
-
+            // 2. 結算統計
             const rate = db.rate || 0.21;
-            document.getElementById('exRate').value = rate;
             let total = 0;
+            const payerTotals = {};
+            db.payers.forEach(p => payerTotals[p] = 0);
+            
             document.getElementById('expList').innerHTML = db.expenses.slice().reverse().map((e, idx) => {
                 total += e.cost;
+                if(payerTotals.hasOwnProperty(e.payer)) payerTotals[e.payer] += e.cost;
                 const realIdx = db.expenses.length - 1 - idx;
-                return `<div class="card p-4 flex justify-between items-center">
+                return `<div class="card p-4 flex justify-between items-center text-left">
                     <div><p class="font-black">${e.name}</p><p class="text-[10px] text-gray-400">NT$ ${Math.round(e.cost * rate).toLocaleString()} (${e.payer})</p></div>
                     <div class="flex items-center gap-3"><span class="font-black text-lg">¥${e.cost.toLocaleString()}</span><button onclick="delExp(${realIdx})" class="text-gray-200">×</button></div>
                 </div>`;
             }).join('');
+
             document.getElementById('totalSpend').innerText = total.toLocaleString();
             document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
-            document.getElementById('expPayer').innerHTML = db.payers.map(p => `<option>${p}</option>`).join('');
+            
+            // 渲染統計小卡
+            document.getElementById('payerStats').innerHTML = Object.entries(payerTotals).map(([p, val]) => `
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-left">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">${p}</p>
+                    <p class="font-black text-sm">¥${val.toLocaleString()}</p>
+                </div>
+            `).join('');
+
+            // 3. 設定頁面名單
+            document.getElementById('payerManagerList').innerHTML = db.payers.map((p, idx) => `
+                <div class="bg-stone-100 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                    ${p} <button onclick="delPayerName(${idx})" class="text-gray-400">×</button>
+                </div>
+            `).join('');
+            
+            // 更新下拉選單
+            document.getElementById('expPayer').innerHTML = db.payers.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            // 更新航班與旅客小卡 (同前版)
+            document.getElementById('f-no').innerText = db.flightMain.no;
+            document.getElementById('f-pnr').innerText = db.flightMain.pnr;
+            document.getElementById('f-airline').innerText = db.flightMain.airline;
+            const psList = document.getElementById('passengerList'); psList.innerHTML = '';
+            db.passengers.forEach((p, idx) => {
+                psList.innerHTML += `<div onclick="editPassenger(${idx})" class="flex-none w-28 p-4 bg-gray-50 border border-gray-100 rounded-2xl text-left"><p class="text-[9px] font-black text-stone-300 mb-1 uppercase tracking-tighter">${p.type}</p><h4 class="font-black text-sm truncate">${p.name}</h4><p class="text-[10px] font-mono font-bold text-blue-600 mt-1">${p.seat || '--'}</p></div>`;
+            });
+            renderCheckList('bring', db.checkBring, 'bringList');
+            renderCheckList('buy', db.checkBuy, 'buyList');
         }
 
+        // 行程操作
+        function openAddItinerary() { 
+            document.getElementById('itIdx').value = -1;
+            document.getElementById('itTitle').innerText = "新增行程項目";
+            document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = '');
+            document.getElementById('delItBtn').classList.add('hidden');
+            openModal('itineraryModal');
+        }
+        function openEditItinerary(idx) {
+            const it = db.itinerary[idx];
+            document.getElementById('itIdx').value = idx;
+            document.getElementById('itTitle').innerText = "編輯行程項目";
+            document.getElementById('itDate').value = it.date;
+            document.getElementById('itTime').value = it.time;
+            document.getElementById('itHeading').value = it.title;
+            document.getElementById('itLoc').value = it.location;
+            document.getElementById('itDrive').value = it.driveInfo || "";
+            document.getElementById('itNote').value = it.note;
+            document.getElementById('delItBtn').classList.remove('hidden');
+            openModal('itineraryModal');
+        }
+        async function saveItinerary() {
+            const idx = parseInt(document.getElementById('itIdx').value);
+            const data = {
+                date: document.getElementById('itDate').value,
+                time: document.getElementById('itTime').value,
+                title: document.getElementById('itHeading').value,
+                location: document.getElementById('itLoc').value,
+                driveInfo: document.getElementById('itDrive').value,
+                note: document.getElementById('itNote').value
+            };
+            if(idx === -1) db.itinerary.push(data); else db.itinerary[idx] = data;
+            db.itinerary.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+            closeModal('itineraryModal'); await pushData();
+        }
+
+        // 成人名單管理
+        async function addPayerName() {
+            const name = document.getElementById('newPayer').value.trim();
+            if(name && !db.payers.includes(name)) {
+                db.payers.push(name);
+                document.getElementById('newPayer').value = '';
+                await pushData();
+            }
+        }
+        async function delPayerName(idx) {
+            if(confirm("確定刪除此付款人？相關帳目名稱將保留但無法再選取。")) {
+                db.payers.splice(idx, 1);
+                await pushData();
+            }
+        }
+
+        // 輔助功能
         function renderCheckList(type, list, containerId) {
             const container = document.getElementById(containerId);
-            container.innerHTML = list.map((item, idx) => `
-                <li class="flex items-center justify-between py-3">
-                    <div class="flex items-center gap-3 cursor-pointer" onclick="toggleItem('${type}', ${idx})">
-                        <i class="fa-solid ${item.done ? 'fa-square-check text-green-500' : 'fa-square text-gray-100'} text-2xl"></i>
-                        <span class="${item.done ? 'line-through text-gray-400' : 'font-bold text-gray-600'}">${item.text}</span>
-                    </div>
-                    <button onclick="delItem('${type}', ${idx})" class="text-gray-200 text-xl">&times;</button>
-                </li>
-            `).join('');
+            container.innerHTML = list.map((item, idx) => `<li class="flex items-center justify-between py-3 text-left"><div class="flex items-center gap-3 cursor-pointer" onclick="toggleItem('${type}', ${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-green-500' : 'fa-square text-gray-100'} text-2xl"></i><span class="${item.done ? 'line-through text-gray-400' : 'font-bold text-gray-600'}">${item.text}</span></div><button onclick="delItem('${type}', ${idx})" class="text-gray-200 text-xl">&times;</button></li>`).join('');
         }
-
-        // --- 互動功能 ---
-        async function addItem(type) { 
-            const input = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); 
-            if(input.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: input.value, done: false}); input.value = ''; await pushData(); }
-        }
-        async function toggleItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy)[idx].done = !(type === 'bring' ? db.checkBring : db.checkBuy)[idx].done; await pushData(); }
-        async function delItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy).splice(idx, 1); await pushData(); }
-        async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); document.getElementById('expName').value=''; document.getElementById('expCost').value=''; await pushData(); } }
-        async function delExp(idx) { db.expenses.splice(idx, 1); await pushData(); }
-        function calcTWD(val) { const rate = parseFloat(document.getElementById('exRate').value) || 0.21; document.getElementById('quickTWD').innerText = `≈ NT$ ${Math.round(val * rate).toLocaleString()}`; }
+        async function pullData() { showSync(true); try { const res = await fetch(GOOGLE_SCRIPT_URL); const data = await res.json(); if(data && data.itinerary) db = data; } catch(e){} renderAll(); showSync(false); }
+        async function pushData() { showSync(true); db.rate = parseFloat(document.getElementById('exRate').value) || 0.21; try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} renderAll(); showSync(false); }
         function switchPage(p) { document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.getElementById('page-'+p).classList.add('active'); document.querySelectorAll('nav button').forEach(el => el.classList.remove('nav-active')); document.getElementById('nav-'+p).classList.add('nav-active'); window.scrollTo(0,0); }
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function editFlightMain() { document.getElementById('m-airline').value = db.flightMain.airline; document.getElementById('m-no').value = db.flightMain.no; document.getElementById('m-pnr').value = db.flightMain.pnr; document.getElementById('m-dep').value = db.flightMain.dep; document.getElementById('m-arr').value = db.flightMain.arr; openModal('flightMainModal'); }
-        async function saveFlightMain() { db.flightMain = { airline: document.getElementById('m-airline').value, no: document.getElementById('m-no').value, pnr: document.getElementById('m-pnr').value, dep: document.getElementById('m-dep').value, arr: document.getElementById('m-arr').value }; await pushData(); closeModal('flightMainModal'); }
-        function editPassenger(idx) { const p = db.passengers[idx]; document.getElementById('psgrIdx').value = idx; document.getElementById('psgrTitle').innerText = `編輯旅客: ${p.type}`; document.getElementById('psgrName').value = p.name; document.getElementById('psgrSeat').value = p.seat; document.getElementById('psgrNote').value = p.note; openModal('psgrModal'); }
-        async function savePassenger() { const idx = document.getElementById('psgrIdx').value; db.passengers[idx].name = document.getElementById('psgrName').value; db.passengers[idx].seat = document.getElementById('psgrSeat').value; db.passengers[idx].note = document.getElementById('psgrNote').value; await pushData(); closeModal('psgrModal'); }
-        function openEditItinerary(idx) { const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; document.getElementById('itNote').value = it.note; openModal('itineraryModal'); }
-        async function saveItinerary() { const idx = document.getElementById('itIdx').value; db.itinerary[idx] = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, note: document.getElementById('itNote').value }; db.itinerary.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time)); await pushData(); closeModal('itineraryModal'); }
-        async function deleteItinerary() { if(confirm("確定刪除？")) { const idx = document.getElementById('itIdx').value; db.itinerary.splice(idx, 1); await pushData(); closeModal('itineraryModal'); } }
-        async function clearAllData() { if(confirm("確定清空所有資料嗎？")) { db.itinerary = []; db.expenses = []; db.checkBring = []; db.checkBuy = []; await pushData(); } }
+        async function updateWeather() { try { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,precipitation_probability&forecast_days=1`); const data = await res.json(); const now = new Date().getHours(); let html = ''; for(let i=0; i<6; i++){ const idx = (now + i) % 24; const temp = Math.round(data.hourly.temperature_2m[idx]); const prob = data.hourly.precipitation_probability[idx]; html += `<div class="weather-item"><p class="text-[9px] font-bold opacity-30">${idx}:00</p><p class="text-lg font-black">${temp}°</p><p class="text-[9px] ${prob > 30 ? 'text-blue-500 font-bold' : 'opacity-30'}">${prob}%</p></div>`; } document.getElementById('weatherContainer').innerHTML = html; } catch(e){} }
+        function calcTWD(val) { const rate = parseFloat(document.getElementById('exRate').value) || 0.21; document.getElementById('quickTWD').innerText = `≈ NT$ ${Math.round(val * rate).toLocaleString()}`; }
+        async function resetToDefault() { if(confirm("恢復 7 天預設行程？")) { db = JSON.parse(JSON.stringify(masterData)); await pushData(); } }
+        async function toggleItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy)[idx].done = !(type === 'bring' ? db.checkBring : db.checkBuy)[idx].done; await pushData(); }
+        async function delItem(type, idx) { (type === 'bring' ? db.checkBring : db.checkBuy).splice(idx, 1); await pushData(); }
+        async function addItem(type) { const input = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); if(input.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: input.value, done: false}); input.value = ''; await pushData(); } }
+        async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); await pushData(); } }
+        async function delExp(idx) { db.expenses.splice(idx, 1); await pushData(); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.remove('opacity-0'); setTimeout(() => t.classList.add('opacity-0'), 2500); }
-        function copyPNR() { const pnr = document.getElementById('f-pnr').innerText; navigator.clipboard.writeText(pnr); toast("訂位代號已複製"); }
+        function copyPNR() { const pnr = document.getElementById('f-pnr').innerText; navigator.clipboard.writeText(pnr); toast("代號已複製"); }
+        function editFlightMain() { document.getElementById('m-airline').value = db.flightMain.airline; document.getElementById('m-no').value = db.flightMain.no; document.getElementById('m-pnr').value = db.flightMain.pnr; document.getElementById('m-dep').value = db.flightMain.dep; document.getElementById('m-arr').value = db.flightMain.arr; openModal('flightMainModal'); }
+        async function saveFlightMain() { db.flightMain = { airline: document.getElementById('m-airline').value, no: document.getElementById('m-no').value, pnr: document.getElementById('m-pnr').value, dep: document.getElementById('m-dep').value, arr: document.getElementById('m-arr').value }; await pushData(); closeModal('flightMainModal'); }
+        function editPassenger(idx) { const p = db.passengers[idx]; document.getElementById('psgrIdx').value = idx; document.getElementById('psgrName').value = p.name; document.getElementById('psgrSeat').value = p.seat; document.getElementById('psgrNote').value = p.note; openModal('psgrModal'); }
+        async function savePassenger() { const idx = document.getElementById('psgrIdx').value; db.passengers[idx].name = document.getElementById('psgrName').value; db.passengers[idx].seat = document.getElementById('psgrSeat').value; db.passengers[idx].note = document.getElementById('psgrNote').value; await pushData(); closeModal('psgrModal'); }
 
-        async function init() { await pullData(); switchPage('itinerary'); }
+        async function init() { await pullData(); switchPage('itinerary'); updateWeather(); }
         init();
     </script>
 </body>
