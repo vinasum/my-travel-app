@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nagoya v10.6</title>
+    <title>Nagoya Express v10.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,24 +12,23 @@
         
         body { 
             font-size: 16px; font-family: 'Noto Sans TC', sans-serif; background-color: var(--n-wago); 
-            /* 使用妳提供的背景圖 */
+            /* 1.1 使用妳提供的背景圖 */
             background-image: url('nagoya sakura bg.jpg');
             background-size: cover; background-attachment: fixed; background-position: center;
             color: #FFFFFF; text-align: left; margin: 0; min-height: 100vh;
         }
 
-        /* 磨砂玻璃卡片 */
         .glass-card { 
             background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-radius: 24px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.2);
             overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); color: #1F2937;
         }
         .glass-card-dark {
-            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border-radius: 20px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* 白霧感導航列 */
+        /* 1.3 白霧感導航列 */
         nav { 
             background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-top: 1px solid rgba(255, 255, 255, 0.2); z-index: 100;
@@ -38,7 +37,6 @@
         .is-past { filter: grayscale(100%) opacity(0.5); transform: scale(0.98); }
         .muji-btn { background: linear-gradient(135deg, #8D6E63 0%, #5D4037 100%); color: white; padding: 16px; border-radius: 18px; font-weight: 700; text-align: center; border: none; width: 100%; display: block; cursor: pointer; }
 
-        /* 白底黑字輸入框防護 */
         label { display: block; font-size: 12px; font-weight: 900; color: var(--n-gold); margin-bottom: 4px; margin-top: 8px; }
         input, select, textarea { width: 100%; border: 1px solid #ddd !important; border-radius: 16px; padding: 14px; margin-bottom: 10px; outline: none; background: #fff !important; color: #333 !important; font-size: 14px !important; }
 
@@ -46,7 +44,6 @@
         .page.active { display: block; }
         .nav-active { color: var(--n-gold) !important; font-weight: 900 !important; }
         
-        /* 還原 v9.1 車程與天氣樣式 */
         .drive-container { margin-left: 32px; margin-top: -8px; margin-bottom: 16px; border-left: 2px dashed rgba(255,255,255,0.3); padding: 12px 0 12px 20px; }
         .drive-tag { background: rgba(255,255,255,0.1); color: #FFF; font-weight: 900; padding: 4px 12px; border-radius: 99px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; }
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; }
@@ -57,7 +54,7 @@
 <body class="max-w-md mx-auto relative px-5">
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
-    <header class="pt-10 pb-6 flex justify-between items-center text-left">
+    <header class="pt-10 pb-6 flex justify-between items-center">
         <div class="flex items-center gap-3"><h1 class="text-2xl font-black text-white">名古屋旅程</h1><i class="fa-solid fa-fish-fins text-amber-400 text-2xl rotate-45"></i></div>
         <button onclick="pullData()" class="text-white/30 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
@@ -78,7 +75,7 @@
                 </div>
             </div>
             <div class="glass-card p-4 bg-white/10 border-none mt-4">
-                <div class="flex justify-between items-center mb-3"><span class="font-black text-white/50 text-[12px]">WEATHER (6H)</span><button onclick="updateWeather()" class="text-amber-400 font-bold text-[12px]">手動更新</button></div>
+                <div class="flex justify-between items-center mb-3"><span class="font-black text-white/50 text-[12px]">WEATHER (6H)</span><button onclick="updateWeather()" class="text-amber-400 font-bold text-[12px]">更新</button></div>
                 <div id="weatherContainer" class="weather-scroll text-white"><p class="w-full text-center opacity-40 py-2 text-sm">按更新載入...</p></div>
             </div>
             <button onclick="openAddItinerary()" class="muji-btn my-4 shadow-xl">＋ 新增行程項目</button>
@@ -89,35 +86,32 @@
             <h2 class="font-black mb-4 text-xl">清單項目</h2>
             <div class="glass-card-dark border-t-4 border-blue-400">
                 <h3 class="font-black text-blue-300 mb-3">要攜帶</h3>
-                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="護照..."><button onclick="addItem('bring')" class="muji-btn w-auto px-6 bg-blue-600 shadow-none">＋</button></div>
-                <div id="bringList" class="text-gray-100"></div>
+                <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="護照..."><button onclick="addItem('bring')" class="muji-btn w-auto px-6 bg-blue-600">＋</button></div>
+                <div id="bringList" class="text-white"></div>
             </div>
             <div class="glass-card-dark mt-4 border-t-4 border-red-400">
                 <h3 class="font-black text-red-300 mb-3">要購買</h3>
-                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="藥妝..."><button onclick="addItem('buy')" class="muji-btn w-auto px-6 bg-red-600 shadow-none">＋</button></div>
-                <div id="buyList" class="text-gray-100"></div>
+                <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="藥妝..."><button onclick="addItem('buy')" class="muji-btn w-auto px-6 bg-red-600">＋</button></div>
+                <div id="buyList" class="text-white"></div>
             </div>
         </div>
 
         <div id="page-budget" class="page">
             <div class="glass-card p-6 bg-gray-900/80 text-white text-center mb-4"><div class="text-4xl font-black text-amber-400">¥ <span id="totalSpend">0</span></div><p class="opacity-50 mt-1 font-bold">≈ NT$ <span id="totalTWD">0</span></p></div>
             <div id="payerStats" class="grid grid-cols-3 gap-2 mb-4"></div>
-            <div class="glass-card p-4"><input id="expName" type="text" placeholder="品項"><input id="expCost" type="number" placeholder="金額(JPY)"><select id="expPayer"></select><button onclick="addExp()" class="muji-btn mt-2 py-3">儲存</button></div>
+            <div class="glass-card p-4"><input id="expName" type="text" placeholder="品項"><input id="expCost" type="number" placeholder="金額"><select id="expPayer"></select><button onclick="addExp()" class="muji-btn mt-2 py-3">儲存</button></div>
             <div id="expList" class="space-y-2 mt-4"></div>
         </div>
 
         <div id="page-tools" class="page">
-            <h2 class="font-black mb-4 text-xl text-amber-400">設定中心</h2>
+            <h2 class="font-black mb-4 text-xl text-amber-400">設定與管理</h2>
             <div class="glass-card-dark"><label>匯率設定</label><input id="exRate" type="number" step="0.001" onchange="saveSettingsOnly()"></div>
-            <div class="glass-card-dark"><label>名單管理</label>
-                <div class="flex gap-2 mb-4"><input id="newPayer" type="text" placeholder="姓名"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div>
-                <div id="payerManagerList" class="flex flex-wrap gap-2"></div>
+            <div class="glass-card-dark"><label>名單管理</label><div class="flex gap-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2"></div></div>
+            <div class="glass-card-dark"><label>數據編輯</label>
+                <button onclick="openFlightEdit()" class="w-full py-4 bg-white/10 rounded-xl font-bold border border-white/10 text-white mb-3">修改航班日期與資訊</button>
+                <button onclick="openPsgrEdit()" class="w-full py-4 bg-white/10 rounded-xl font-bold border border-white/10 text-white">編輯 5 位旅客詳細資料</button>
             </div>
-            <div class="glass-card-dark"><label>航班主體設定 (行程頁第一層)</label>
-                <button onclick="openFlightEdit()" class="w-full py-4 bg-white/10 rounded-xl font-bold border border-white/10 text-white mb-3">編輯去程/回程所有資訊</button>
-                <button onclick="openPsgrEdit()" class="w-full py-4 bg-white/10 rounded-xl font-bold border border-white/10 text-white">編輯 5 位旅客詳細名單</button>
-            </div>
-            <button onclick="resetToDefault()" class="w-full py-4 mt-10 text-red-400/30 font-bold border border-red-400/10 rounded-2xl">🆘 數據重置 (清空緩存)</button>
+            <button onclick="resetToDefault()" class="w-full py-4 mt-10 text-red-400/30 font-bold border border-red-400/10 rounded-2xl">🆘 恢復備份 (重整數據)</button>
         </div>
     </main>
 
@@ -128,32 +122,39 @@
         <button onclick="switchPage('tools')" id="nav-tools" class="text-white/40 flex flex-col items-center"><i class="fa-solid fa-user-gear text-xl"></i><span class="text-[10px] font-bold mt-1">設定</span></button>
     </nav>
 
-    <div id="itineraryModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[85vh] overflow-y-auto text-gray-800"><h3>編輯行程</h3><input type="hidden" id="itIdx"><input id="itDate" type="date"><input id="itTime" type="time"><input id="itDrive" type="text" placeholder="🚗 下一站車程"><input id="itHeading" type="text" placeholder="名稱"><input id="itLoc" type="text" placeholder="地點"><textarea id="itNote" placeholder="備註" style="height:120px"></textarea><button onclick="saveItinerary()" class="muji-btn mt-4">儲存</button><button onclick="closeModal('itineraryModal')" class="w-full py-4 text-gray-400">取消</button></div></div>
+    <div id="itineraryModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[85vh] overflow-y-auto text-gray-800"><h3>行程編輯</h3><input type="hidden" id="itIdx"><input id="itDate" type="date"><input id="itTime" type="time"><input id="itDrive" type="text" placeholder="🚗 下一站車程"><input id="itHeading" type="text" placeholder="名稱"><input id="itLoc" type="text" placeholder="地點"><textarea id="itNote" style="height:120px"></textarea><button onclick="saveItinerary()" class="muji-btn mt-4">儲存</button><button onclick="closeModal('itineraryModal')" class="w-full py-4 text-gray-400">取消</button></div></div>
     <div id="viewModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-8 relative text-gray-800"><button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-2xl">×</button><div id="viewContent"></div><div class="mt-8 space-y-3"><button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-3xl font-black">導航</button><div class="grid grid-cols-2 gap-3"><button id="viewEditBtn" class="py-4 bg-stone-100 rounded-2xl font-bold">編輯</button><button id="viewDelBtn" class="py-4 bg-red-50 text-red-400 rounded-2xl font-bold">刪除</button></div></div></div></div>
-    <div id="psgrListModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[80vh] overflow-y-auto text-gray-800 relative"><button onclick="closeModal('psgrListModal')" class="absolute top-4 right-4 text-xl">×</button><h3 class="font-black text-xl mb-6">旅客資訊</h3><div id="psgrContainer" class="space-y-3"></div></div></div>
-    
-    <div id="flightEditModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[85vh] overflow-y-auto text-gray-800">
-        <h3>航班設定</h3>
-        <label>航空公司</label><input id="in-airline">
-        <p class="font-black text-blue-600 mt-4">去程</p>
-        <div class="grid grid-cols-2 gap-2"><input id="in-dep-from" placeholder="機場從"><input id="in-dep-to" placeholder="機場到"></div>
-        <input id="in-dep-date" type="date"><div class="grid grid-cols-3 gap-1"><input id="in-dep-no" placeholder="編號"><input id="in-dep-time" type="time"><input id="in-dep-arr-time" type="time"></div>
-        <p class="font-black text-red-600 mt-4">回程</p>
-        <div class="grid grid-cols-2 gap-2"><input id="in-arr-from" placeholder="機場從"><input id="in-arr-to" placeholder="機場到"></div>
-        <input id="in-arr-date" type="date"><div class="grid grid-cols-3 gap-1"><input id="in-arr-no" placeholder="編號"><input id="in-arr-time" type="time"><input id="in-arr-arr-time" type="time"></div>
-        <button onclick="saveFlightMain()" class="muji-btn mt-6">儲存</button><button onclick="closeModal('flightEditModal')" class="w-full py-4 text-gray-400">取消</button>
-    </div></div>
+    <div id="psgrListModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[80vh] overflow-y-auto text-gray-800 relative"><button onclick="closeModal('psgrListModal')" class="absolute top-4 right-4">×</button><h3 class="font-black text-xl mb-4 text-gray-800">旅客資訊</h3><div id="psgrContainer" class="space-y-3"></div></div></div>
+    <div id="flightEditModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[85vh] overflow-y-auto text-gray-800"><h3>航班設定</h3><label>航空公司</label><input id="in-airline"><p class="font-black text-blue-600 mt-4">去程</p><div class="grid grid-cols-2 gap-2"><input id="in-dep-from" placeholder="機場從"><input id="in-dep-to" placeholder="機場到"></div><input id="in-dep-date" type="date"><div class="grid grid-cols-3 gap-1"><input id="in-dep-no" placeholder="編號"><input id="in-dep-time" type="time"><input id="in-dep-arr-time" type="time"></div><p class="font-black text-red-600 mt-4">回程</p><div class="grid grid-cols-2 gap-2"><input id="in-arr-from" placeholder="機場從"><input id="in-arr-to" placeholder="機場到"></div><input id="in-arr-date" type="date"><div class="grid grid-cols-3 gap-1"><input id="in-arr-no" placeholder="編號"><input id="in-arr-time" type="time"><input id="in-arr-arr-time" type="time"></div><button onclick="saveFlightMain()" class="muji-btn mt-6">儲存</button><button onclick="closeModal('flightEditModal')" class="w-full py-4 text-gray-400">取消</button></div></div>
     <div id="psgrEditModal" class="hidden modal-overlay"><div class="glass-card w-full max-w-sm p-6 h-[85vh] overflow-y-auto text-gray-800"><h3>編輯旅客資訊</h3><div id="psgrInputs"></div><button onclick="savePassengers()" class="muji-btn mt-4">儲存名單</button><button onclick="closeModal('psgrEditModal')" class="w-full py-4 text-gray-400">取消</button></div></div>
     <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full opacity-0 transition-all z-[9999] pointer-events-none"></div>
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
-        const DB_KEY = 'vina_travel_v10_6';
+        const DB_KEY = 'vina_travel_v10_7';
+        // 2.0 預設行程備份點
         const masterData = {
             flightMain: { airline: "星宇航空", depFrom: "TPE", depTo: "NGO", depDate: "2026-05-23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", arrFrom: "NGO", arrTo: "TPE", arrDate: "2026-05-29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30" },
-            passengers: Array(5).fill().map((_, i) => ({ name: "旅客 " + (i+1), pnr: "VINA88", seat: "--", meal: "--" })),
-            itinerary: [{ date: "2026-05-23", time: "15:30", driveTime: "45min", title: "抵達機場 & 取車", location: "中部國際機場(NGO)", note: "" }],
-            checkBring: [{text:"護照", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
+            passengers: [
+                { name: "薇那 (Vina)", pnr: "VINA88", seat: "12A", meal: "Standard" },
+                { name: "大人 B", pnr: "VINA88", seat: "12B", meal: "Standard" },
+                { name: "大人 C", pnr: "VINA88", seat: "12C", meal: "Standard" },
+                { name: "小朋友 D", pnr: "VINA88", seat: "13A", meal: "Child" },
+                { name: "小朋友 E", pnr: "VINA88", seat: "13B", meal: "Child" }
+            ],
+            itinerary: [
+                { date: "2026-05-23", time: "15:30", driveTime: "45min", title: "抵達 & 取車", location: "中部國際機場(NGO)", note: "需前往租車櫃檯。" },
+                { date: "2026-05-23", time: "18:30", driveTime: "", title: "入住 & 晚餐", location: "武士之家 (Samurai House)", note: "附近有味噌豬排。" },
+                { date: "2026-05-24", time: "10:00", driveTime: "20min", title: "名古屋港水族館", location: "名古屋港水族館", note: "看虎鯨與企鵝遊行。" },
+                { date: "2026-05-24", time: "14:30", driveTime: "", title: "海洋列車樂園", location: "名古屋港シートレインランド", note: "就在水族館旁邊。" },
+                { date: "2026-05-25", time: "10:00", driveTime: "40min", title: "樂高樂園 LEGOLAND", location: "日本樂高樂園", note: "全天行程。" },
+                { date: "2026-05-26", time: "10:30", driveTime: "35min", title: "吉卜力公園", location: "吉卜力公園", note: "需預約大倉庫門票。" },
+                { date: "2026-05-27", time: "10:00", driveTime: "15min", title: "東山動植物園", location: "東山動植物園", note: "看大猩猩夏巴尼。" },
+                { date: "2026-05-28", time: "10:00", driveTime: "45min", title: "麵包超人博物館", location: "名古屋麵包超人兒童博物館", note: "親子必去。" },
+                { date: "2026-05-29", time: "11:00", driveTime: "", title: "最後採買 & 退房", location: "AEON Mall Nagoya", note: "" },
+                { date: "2026-05-29", time: "16:35", driveTime: "", title: "回程航班", location: "中部國際機場(NGO)", note: "星宇航空 JX831。" }
+            ],
+            checkBring: [{text:"護照", done:false}, {text:"國際駕照", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
         };
         let db = JSON.parse(JSON.stringify(masterData));
 
@@ -198,7 +199,7 @@
             document.getElementById('totalSpend').innerText = total.toLocaleString(); document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
             document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `<div class="bg-white/10 p-2 rounded-2xl text-center"><p class="opacity-40 text-[10px] uppercase">${p}</p><p class="font-black">¥${v.toLocaleString()}</p></div>`).join('');
             document.getElementById('expPayer').innerHTML = (db.payers||[]).map(p => `<option value="${p}">${p}</option>`).join('');
-            document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `<div class="bg-white/10 px-4 py-1 rounded-full text-sm">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
+            document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `<div class="bg-white/10 px-4 py-1 rounded-full text-sm text-white">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
         }
 
         function renderCheckList(t, list, cid) { document.getElementById(cid).innerHTML = list.map((item, idx) => `<div class="list-row"><div class="flex items-center gap-4 flex-grow" onclick="toggleCheck('${t}',${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-white/20'} text-2xl"></i><span class="${item.done ? 'opacity-30 line-through' : 'font-bold'}">${item.text}</span></div><button onclick="delItem('${t}',${idx})" class="opacity-20 ml-4">×</button></div>`).join(''); }
@@ -208,31 +209,20 @@
         function openAddItinerary() { document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); document.getElementById('itIdx').value = "-1"; openModal('itineraryModal'); }
         async function saveItinerary() { const idx = document.getElementById('itIdx').value; const data = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, driveTime: document.getElementById('itDrive').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, note: document.getElementById('itNote').value }; if(idx === "-1") db.itinerary.push(data); else db.itinerary[idx] = data; closeModal('itineraryModal'); pushData(); }
         function openPassengerList() { document.getElementById('psgrContainer').innerHTML = db.passengers.map(p => `<div class="p-4 glass-card bg-stone-50/80"><p class="font-black text-lg">${p.name}</p><p class="text-amber-600 font-bold">${p.pnr}</p><div class="flex gap-4 opacity-50 text-xs mt-2"><span>座: ${p.seat}</span><span>餐: ${p.meal}</span></div></div>`).join(''); openModal('psgrListModal'); }
-        
-        function openFlightEdit() { 
-            const f = db.flightMain; document.getElementById('in-airline').value = f.airline;
-            document.getElementById('in-dep-from').value = f.depFrom; document.getElementById('in-dep-to').value = f.depTo;
-            document.getElementById('in-dep-date').value = f.depDate; document.getElementById('in-dep-no').value = f.depNo;
-            document.getElementById('in-dep-time').value = f.depTime; document.getElementById('in-dep-arr-time').value = f.depArrTime;
-            document.getElementById('in-arr-from').value = f.arrFrom; document.getElementById('in-arr-to').value = f.arrTo;
-            document.getElementById('in-arr-date').value = f.arrDate; document.getElementById('in-arr-no').value = f.arrNo;
-            document.getElementById('in-arr-time').value = f.arrTime; document.getElementById('in-arr-arr-time').value = f.arrArrTime;
-            openModal('flightEditModal'); 
-        }
+        function openFlightEdit() { const f = db.flightMain; document.getElementById('in-airline').value = f.airline; document.getElementById('in-dep-from').value = f.depFrom; document.getElementById('in-dep-to').value = f.depTo; document.getElementById('in-dep-date').value = f.depDate; document.getElementById('in-dep-no').value = f.depNo; document.getElementById('in-dep-time').value = f.depTime; document.getElementById('in-dep-arr-time').value = f.depArrTime; document.getElementById('in-arr-from').value = f.arrFrom; document.getElementById('in-arr-to').value = f.arrTo; document.getElementById('in-arr-date').value = f.arrDate; document.getElementById('in-arr-no').value = f.arrNo; document.getElementById('in-arr-time').value = f.arrTime; document.getElementById('in-arr-arr-time').value = f.arrArrTime; openModal('flightEditModal'); }
         function saveFlightMain() { db.flightMain = { airline: document.getElementById('in-airline').value, depFrom: document.getElementById('in-dep-from').value, depTo: document.getElementById('in-dep-to').value, depDate: document.getElementById('in-dep-date').value, depNo: document.getElementById('in-dep-no').value, depTime: document.getElementById('in-dep-time').value, depArrTime: document.getElementById('in-dep-arr-time').value, arrFrom: document.getElementById('in-arr-from').value, arrTo: document.getElementById('in-arr-to').value, arrDate: document.getElementById('in-arr-date').value, arrNo: document.getElementById('in-arr-no').value, arrTime: document.getElementById('in-arr-time').value, arrArrTime: document.getElementById('in-arr-arr-time').value }; closeModal('flightEditModal'); pushData(); }
         function openPsgrEdit() { document.getElementById('psgrInputs').innerHTML = db.passengers.map((p, i) => `<div class="mb-4 border-b pb-2"><label>旅客 ${i+1}</label><input id="pName${i}" value="${p.name}"><div class="grid grid-cols-2 gap-2"><input id="pSeat${i}" value="${p.seat}"><input id="pMeal${i}" value="${p.meal}"></div></div>`).join(''); openModal('psgrEditModal'); }
         function savePassengers() { db.passengers = db.passengers.map((_, i) => ({ name: document.getElementById('pName'+i).value, pnr: "VINA88", seat: document.getElementById('pSeat'+i).value, meal: document.getElementById('pMeal'+i).value })); closeModal('psgrEditModal'); pushData(); }
-
         async function addItem(t) { const inp = document.getElementById(t + 'Input'); if(inp.value) { db[t === 'bring' ? 'checkBring' : 'checkBuy'].push({text: inp.value, done: false}); inp.value = ''; pushData(); } }
         async function toggleCheck(t, i) { const list = db[t === 'bring' ? 'checkBring' : 'checkBuy']; list[i].done = !list[i].done; pushData(); }
         async function delItem(t, i) { db[t === 'bring' ? 'checkBring' : 'checkBuy'].splice(i, 1); pushData(); }
         async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); await pushData(); } }
-        async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); document.getElementById('newPayer').value=''; await pushData(); } }
+        async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); document.getElementById('newPayer').value=''; pushData(); } }
         function delPayerName(i) { db.payers.splice(i,1); pushData(); }
         function saveSettingsOnly() { db.rate = parseFloat(document.getElementById('exRate').value); pushData(); }
         async function pushData() { showSync(true); localStorage.setItem(DB_KEY, JSON.stringify(db)); renderAll(); try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} showSync(false); }
         async function pullData() { showSync(true); try { const res = await fetch(GOOGLE_SCRIPT_URL); const data = await res.json(); if(data) { db = data; localStorage.setItem(DB_KEY, JSON.stringify(db)); renderAll(); toast("🏮 同步成功"); } } catch (e) {} showSync(false); }
-        function resetToDefault() { if(confirm("確定重置？")) { localStorage.clear(); location.reload(); } }
+        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
         init();
