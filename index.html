@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v8.1</title>
+    <title>v8.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --n-gold: #E6B422; --n-miso: #8D6E63; --n-paper: #FDFBF7; }
-        body { font-size: 16px; font-family: 'Noto Sans TC', sans-serif; background-color: var(--n-paper); color: #1F2937; text-align: left; margin: 0; padding: 0; }
+        body { font-size: 16px; font-family: 'Noto Sans TC', sans-serif; background-color: var(--n-paper); color: #1F2937; text-align: left; }
+        /* 確保字體在 14px 以上 */
         p, span, div, input, button, label, select, textarea { font-size: 14px !important; }
         
         .card { background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 12px; border: 1px solid rgba(230,180,34,0.15); overflow: hidden; }
@@ -19,14 +20,16 @@
         .page.active { display: block; }
         .nav-active { color: var(--n-miso) !important; font-weight: 900 !important; }
 
-        /* 清單 UI：強行垂直居中、不換行、間距 12px */
-        .list-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.03); flex-wrap: nowrap !important; }
-        .list-content { display: flex; align-items: center; gap: 12px; flex-grow: 1; min-width: 0; }
-        .list-text { font-weight: 700; color: #4B5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
-        .list-del-btn { flex-shrink: 0 !important; color: #D1D5DB; padding: 0 10px; font-size: 24px !important; display: flex; align-items: center; height: 32px; }
+        /* 車程顯示樣式 */
+        .drive-line { border-left: 2px dashed #D1D5DB; margin-left: 28px; padding: 10px 0 10px 20px; position: relative; }
+        .drive-tag { background: #F3F4F6; color: #6B7280; font-weight: 900; padding: 4px 12px; border-radius: 99px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; }
 
-        .weather-scroll { display: flex; overflow-x: auto; gap: 10px; }
-        .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.8); padding: 10px 5px; border-radius: 18px; border: 1px solid rgba(230,180,34,0.1); }
+        /* 清單對齊樣式 */
+        .list-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03); flex-wrap: nowrap !important; }
+        .list-content { display: flex; align-items: center; gap: 16px; flex-grow: 1; min-width: 0; cursor: pointer; }
+        .list-text { font-weight: 700; color: #4B5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; margin: 0; }
+        .list-del-btn { flex-shrink: 0 !important; color: #D1D5DB; padding: 0 10px; font-size: 26px !important; display: flex; align-items: center; }
+
         input, select, textarea { width: 100%; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; margin-bottom: 10px; outline: none; background: #fff; box-sizing: border-box; }
     </style>
 </head>
@@ -36,58 +39,49 @@
     <header class="p-6 pt-10 flex justify-between items-center text-left">
         <div>
             <h1 class="text-2xl font-black text-gray-800">名古屋旅程</h1>
-            <p class="text-stone-400 font-bold uppercase tracking-widest text-[10px]">v8.1 Stable</p>
+            <p class="text-stone-400 font-bold uppercase tracking-widest text-[10px]">v8.3 Admin</p>
         </div>
         <button onclick="pullData()" class="text-stone-300 text-3xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
     <main class="px-5">
         <div id="page-itinerary" class="page active text-left">
-            <div onclick="openFlightModal()" class="card p-5 border-t-8 border-amber-400">
-                <div class="flex justify-between items-center mb-3"><h2 class="font-black text-lg" id="f-airline">載入中...</h2><i class="fa-solid fa-chevron-right text-stone-200"></i></div>
-                <div class="space-y-1">
-                    <p id="f-dep-line" class="font-bold text-gray-600">載入中...</p>
-                    <p id="f-arr-line" class="font-bold text-gray-600">載入中...</p>
-                </div>
-            </div>
-            <div class="card p-4 bg-blue-50/50 border-none">
-                <div class="flex justify-between items-center mb-3"><span class="font-black text-gray-500 uppercase text-[12px]">Weather (6H)</span>
-                    <div class="flex gap-2">
-                        <button onclick="window.open('https://weather.yahoo.co.jp/weather/jp/23/5110.html')" class="text-blue-500 font-bold text-[12px]">Yahoo</button>
-                        <button onclick="updateWeather()" class="text-amber-600 font-bold text-[12px]">更新</button>
+            <div onclick="openPassengerList()" class="card p-5 border-t-8 border-amber-400 active:bg-stone-50">
+                <div class="flex justify-between items-center mb-4"><h2 class="font-black text-xl text-gray-800" id="f-airline">航空公司</h2><i class="fa-solid fa-chevron-right text-stone-200"></i></div>
+                <div class="space-y-4">
+                    <div>
+                        <p class="font-black text-gray-800">去程：<span id="f-dep-date">--/--</span> <span id="f-dep-from">---</span> <i class="fa-solid fa-plane text-[10px] text-blue-400"></i> <span id="f-dep-to">---</span></p>
+                        <p class="font-bold text-gray-500 mt-1"><span id="f-dep-no">---</span> <span id="f-dep-time">--:--</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> <span id="f-dep-arr-time">--:--</span></p>
+                    </div>
+                    <div>
+                        <p class="font-black text-gray-800">回程：<span id="f-arr-date">--/--</span> <span id="f-arr-from">---</span> <i class="fa-solid fa-plane text-[10px] text-red-400"></i> <span id="f-arr-to">---</span></p>
+                        <p class="font-bold text-gray-500 mt-1"><span id="f-arr-no">---</span> <span id="f-arr-time">--:--</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> <span id="f-arr-arr-time">--:--</span></p>
                     </div>
                 </div>
-                <div id="weatherContainer" class="weather-scroll"><p class="w-full text-center opacity-40 py-2">待更新...</p></div>
+                <button onclick="event.stopPropagation(); openFlightEdit();" class="mt-4 w-full py-2 bg-stone-50 text-stone-400 text-[11px] font-bold rounded-xl border border-dashed border-stone-200">手動修改航班</button>
             </div>
-            <button onclick="openAddItinerary()" class="muji-btn mb-4">＋ 新增行程項目</button>
+
+            <button onclick="openAddItinerary()" class="muji-btn my-4">＋ 新增行程項目</button>
             <div id="itineraryList" class="space-y-0"></div>
-            <button onclick="resetToDefault()" class="w-full py-4 mt-20 text-stone-600 font-black border-2 border-stone-200 rounded-2xl bg-stone-100">🆘 恢復備份行程（強制重整）</button>
+            <button onclick="resetToDefault()" class="w-full py-4 mt-20 text-stone-600 font-black border-2 border-stone-200 rounded-2xl bg-stone-100">🆘 恢復備份 (重整網頁)</button>
         </div>
 
         <div id="page-items" class="page text-left">
             <h2 class="font-black mb-4 text-xl">清單項目</h2>
-            <div class="card p-5 border-t-4 border-blue-400">
-                <h3 class="font-black text-blue-500 mb-3 text-lg">要攜帶</h3>
-                <div class="flex gap-2 mb-2"><input id="bringInput" type="text" placeholder="帶什麼？"><button onclick="addItem('bring')" class="muji-btn w-auto px-5 bg-blue-500 shadow-none">＋</button></div>
-                <div id="bringList"></div>
-            </div>
-            <div class="card p-5 border-t-4 border-red-400 mt-4">
-                <h3 class="font-black text-red-500 mb-3 text-lg">要購買</h3>
-                <div class="flex gap-2 mb-2"><input id="buyInput" type="text" placeholder="買什麼？"><button onclick="addItem('buy')" class="muji-btn w-auto px-5 bg-red-500 shadow-none">＋</button></div>
-                <div id="buyList"></div>
-            </div>
+            <div class="card p-5 border-t-4 border-blue-400"><h3 class="font-black text-blue-500 mb-3 text-lg">要攜帶</h3><div class="flex gap-2 mb-2"><input id="bringInput" type="text" placeholder="帶什麼？"><button onclick="addItem('bring')" class="muji-btn w-auto px-5 bg-blue-500 shadow-none">＋</button></div><div id="bringList"></div></div>
+            <div class="card p-5 border-t-4 border-red-400 mt-4"><h3 class="font-black text-red-500 mb-3 text-lg">要購買</h3><div class="flex gap-2 mb-2"><input id="buyInput" type="text" placeholder="買什麼？"><button onclick="addItem('buy')" class="muji-btn w-auto px-5 bg-red-500 shadow-none">＋</button></div><div id="buyList"></div></div>
         </div>
 
         <div id="page-budget" class="page text-left">
             <div class="card p-8 bg-stone-800 text-white text-center mb-4"><div class="text-3xl font-black">¥ <span id="totalSpend">0</span></div><p class="opacity-50 mt-1 font-bold">≈ NT$ <span id="totalTWD">0</span></p></div>
             <div id="payerStats" class="grid grid-cols-3 gap-2 mb-4 text-center"></div>
-            <div class="card p-5"><input id="expName" type="text" placeholder="品項"><input id="expCost" type="number" placeholder="日圓(JPY)"><select id="expPayer"></select><button onclick="addExp()" class="muji-btn mt-2">儲存紀錄</button></div>
+            <div class="card p-5"><input id="expName" type="text" placeholder="項目"><input id="expCost" type="number" placeholder="日圓(JPY)"><select id="expPayer"></select><button onclick="addExp()" class="muji-btn mt-2">儲存紀錄</button></div>
             <div id="expList" class="space-y-2 mt-4"></div>
         </div>
 
         <div id="page-tools" class="page text-left">
             <h2 class="font-black mb-6 text-xl">設定</h2>
-            <div class="card p-6">名單管理<div class="flex gap-2 mt-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2 mb-6"></div>匯率 (1 JPY = ? TWD)<input id="exRate" type="number" step="0.001" value="0.21" onchange="saveSettingsOnly()" class="text-amber-600 font-bold"></div>
+            <div class="card p-6">名單管理<div class="flex gap-2 mt-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2 mb-6 text-center"></div>匯率 (1 JPY = ? TWD)<input id="exRate" type="number" step="0.001" value="0.21" onchange="saveSettingsOnly()" class="text-amber-600 font-bold"></div>
         </div>
     </main>
 
@@ -98,28 +92,21 @@
         <button onclick="switchPage('tools')" id="nav-tools" class="text-stone-300"><i class="fa-solid fa-user-gear text-2xl"></i></button>
     </nav>
 
-    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] text-left"><div class="card w-full p-6 h-[85vh] overflow-y-auto"><h3>編輯項目</h3><input type="hidden" id="itIdx"><input id="itDate" type="text" placeholder="05/23"><input id="itTime" type="time"><input id="itHeading" type="text" placeholder="標題"><input id="itLoc" type="text" placeholder="地點"><textarea id="itNote" placeholder="備註" style="width:100%;height:150px;border:1px solid #ddd;border-radius:16px;padding:10px;"></textarea><button onclick="saveItinerary()" class="muji-btn mt-4">儲存</button><button onclick="closeModal('itineraryModal')" class="w-full py-4 text-stone-400">取消</button></div></div>
-    <div id="viewModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[200] text-left"><div class="card w-full p-8 relative min-h-[60vh] flex flex-col"><button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-2xl">×</button><div id="viewContent" class="flex-grow"></div><div class="mt-8 space-y-4"><button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-xl shadow-lg">地圖導航</button><div class="grid grid-cols-2 gap-4"><button id="viewEditBtn" class="py-5 bg-stone-100 rounded-2xl">編輯</button><button id="viewDelBtn" class="py-5 bg-red-50 text-red-400 rounded-2xl">刪除</button></div></div></div></div>
-    <div id="flightModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-md text-left"><div class="card w-full p-6 h-[85vh] overflow-y-auto border-t-8 border-amber-400"><h3>航班旅客詳情</h3><button onclick="closeModal('flightModal')" class="absolute top-6 right-6 text-2xl">×</button><div id="psgrCardList" class="space-y-3 mt-8"></div></div></div>
+    <div id="itineraryModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] text-left"><div class="card w-full p-6 h-[85vh] overflow-y-auto"><h3>編輯行程項目</h3><input type="hidden" id="itIdx"><input id="itDate" type="text" placeholder="日期 (05/23)"><input id="itTime" type="time" placeholder="起點時間"><input id="itDrive" type="text" placeholder="🚗 車程時間 (例如 45min)"><input id="itHeading" type="text" placeholder="行程名稱 (可不填)"><input id="itLoc" type="text" placeholder="地點 (可不填)"><textarea id="itNote" placeholder="備註 (可不填)" style="width:100%;height:150px;border:1px solid #ddd;border-radius:16px;padding:10px;"></textarea><button onclick="saveItinerary()" class="muji-btn mt-4">確認儲存</button><button onclick="closeModal('itineraryModal')" class="w-full py-4 text-stone-400">取消</button></div></div>
+    <div id="viewModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[200] text-left"><div class="card w-full p-8 relative min-h-[60vh] flex flex-col"><button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-2xl">×</button><div id="viewContent" class="flex-grow"></div><div class="mt-8 space-y-4"><button id="viewMapBtn" class="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-xl shadow-lg">開啟導航</button><div class="grid grid-cols-2 gap-4"><button id="viewEditBtn" class="py-5 bg-stone-100 rounded-2xl font-bold">編輯</button><button id="viewDelBtn" class="py-5 bg-red-50 text-red-400 rounded-2xl font-bold">刪除</button></div></div></div></div>
+    <div id="psgrListModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[300] backdrop-blur-md"><div class="card w-full p-6 h-[80vh] overflow-y-auto border-t-8 border-amber-400 relative"><button onclick="closeModal('psgrListModal')" class="absolute top-4 right-4 text-2xl text-stone-300">×</button><h3 class="font-black text-xl mb-6">旅客資訊 (點擊可編輯)</h3><div id="psgrContainer" class="space-y-3"></div></div></div>
+    <div id="psgrEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400]"><div class="card w-full p-6"><h3 class="font-black text-lg mb-4">編輯旅客資訊</h3><input type="hidden" id="edit-psgr-idx"><input id="edit-psgr-name" placeholder="姓名"><input id="edit-psgr-pnr" placeholder="訂位代號"><input id="edit-psgr-seat" placeholder="座位"><input id="edit-psgr-meal" placeholder="餐飲"><button onclick="savePassengerData()" class="muji-btn mt-6">儲存修改</button><button onclick="closeModal('psgrEditModal')" class="w-full py-4 text-stone-400">取消</button></div></div>
+    <div id="flightEditModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[400]"><div class="card w-full p-6 max-h-[90vh] overflow-y-auto"><h3 class="font-black text-lg mb-4">航班手動設定</h3><input id="in-airline" placeholder="航空公司"><div class="grid grid-cols-2 gap-2 mt-4"><input id="in-dep-from" placeholder="去程起飛機場"><input id="in-dep-to" placeholder="去程降落機場"><input id="in-dep-date" placeholder="去程日期"><input id="in-dep-no" placeholder="去程航班編號"><input id="in-dep-time" placeholder="去程起飛時間"><input id="in-dep-arr-time" placeholder="去程降落時間"></div><div class="grid grid-cols-2 gap-2 mt-4"><input id="in-arr-from" placeholder="回程起飛機場"><input id="in-arr-to" placeholder="回程降落機場"><input id="in-arr-date" placeholder="回程日期"><input id="in-arr-no" placeholder="回程航班編號"><input id="in-arr-time" placeholder="回程起飛時間"><input id="in-arr-arr-time" placeholder="回程降落時間"></div><button onclick="saveFlightMain()" class="muji-btn mt-4">儲存航班設定</button></div></div>
     <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full opacity-0 transition-opacity z-[9999] pointer-events-none"></div>
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
-        const DB_KEY = 'vina_travel_v8_1';
+        const DB_KEY = 'vina_travel_v8_3';
         const masterData = {
-            flightMain: { airline: "星宇航空", depDate: "05/23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", depFrom: "TPE", depTo: "NGO", arrDate: "05/29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30", arrFrom: "NGO", arrTo: "TPE" },
-            passengers: Array(5).fill().map((_, i) => ({ name: "旅客 " + (i+1), dep: {pnr:"VINA88", seat:"--", meal:"一般餐"}, ret: {pnr:"VINA88", seat:"--", meal:"一般餐"} })),
-            itinerary: [
-                { date: "05/23", time: "15:30", title: "抵達機場 & 取車", location: "中部國際機場(NGO)", note: "辦理取車手續。" },
-                { date: "05/23", time: "18:30", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", note: "吃味噌豬排！" },
-                { date: "05/24", time: "11:00", title: "樂高樂園", location: "LEGOLAND Japan", note: "小孩放電日。" },
-                { date: "05/25", time: "11:00", title: "磁浮鐵道館", location: "SCMAGLEV Park", note: "火車模型。" },
-                { date: "05/26", time: "11:00", title: "麵包超人樂園", location: "長島度假村", note: "開車約40min。" },
-                { date: "05/27", time: "11:00", title: "名古屋港水族館", location: "名古屋港水族館", note: "看虎鯨。" },
-                { date: "05/28", time: "11:00", title: "豐田技術館", location: "トヨタ産業技術記念館", note: "室內遊玩。" },
-                { date: "05/29", time: "11:00", title: "採買 & 還車", location: "中部國際機場", note: "14:30 報到。" }
-            ],
-            checkBring: [{text:"護照", done:false},{text:"日文譯本", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
+            flightMain: { airline: "星宇航空", depFrom: "TPE", depTo: "NGO", depDate: "05/23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", arrFrom: "NGO", arrTo: "TPE", arrDate: "05/29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30" },
+            passengers: Array(5).fill().map((_, i) => ({ name: "旅客 " + (i+1), pnr: "ABCDEF", seat: "--", meal: "--" })),
+            itinerary: [{ date: "05/23", time: "15:30", driveTime: "", title: "抵達機場 & 取車", location: "中部國際機場(NGO)", note: "啟程！" }],
+            checkBring: [{text:"護照", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
         };
         let db = JSON.parse(JSON.stringify(masterData));
 
@@ -128,100 +115,81 @@
             document.getElementById('page-' + p).classList.add('active');
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('nav-active'));
             document.getElementById('nav-' + p).classList.add('nav-active');
-            window.scrollTo(0,0);
         }
 
-        function init() {
-            try {
-                const local = localStorage.getItem(DB_KEY);
-                if (local) db = JSON.parse(local);
-                renderAll();
-            } catch(e) { console.error(e); renderAll(); }
-        }
-
-        async function pullData() {
-            showSync(true);
-            try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
-                const data = await res.json();
-                if(data && data.itinerary) { db = data; saveLocal(); renderAll(); toast("🏮 同步完成"); }
-            } catch (e) { toast("同步失敗"); }
-            showSync(false);
-        }
-
-        async function pushData() {
-            showSync(true); saveLocal(); renderAll();
-            try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){}
-            showSync(false);
-        }
-
+        function init() { try { const local = localStorage.getItem(DB_KEY); if (local) db = JSON.parse(local); renderAll(); } catch(e) { renderAll(); } }
+        async function pullData() { showSync(true); try { const res = await fetch(GOOGLE_SCRIPT_URL); const data = await res.json(); if(data && data.itinerary) { db = data; saveLocal(); renderAll(); toast("🏮 同步完成"); } } catch (e) { toast("同步失敗"); } showSync(false); }
+        async function pushData() { showSync(true); saveLocal(); renderAll(); try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} showSync(false); }
         function saveLocal() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
         function renderAll() {
             try {
-                const f = db.flightMain || masterData.flightMain;
+                const f = db.flightMain;
                 document.getElementById('f-airline').innerText = f.airline;
-                document.getElementById('f-dep-line').innerText = f.depDate + ' ' + f.depNo + ' ' + f.depTime;
-                document.getElementById('f-arr-line').innerText = f.arrDate + ' ' + f.arrNo + ' ' + f.arrTime;
+                document.getElementById('f-dep-from').innerText = f.depFrom; document.getElementById('f-dep-to').innerText = f.depTo;
+                document.getElementById('f-dep-date').innerText = f.depDate; document.getElementById('f-dep-no').innerText = f.depNo;
+                document.getElementById('f-dep-time').innerText = f.depTime; document.getElementById('f-dep-arr-time').innerText = f.depArrTime;
+                document.getElementById('f-arr-from').innerText = f.arrFrom; document.getElementById('f-arr-to').innerText = f.arrTo;
+                document.getElementById('f-arr-date').innerText = f.arrDate; document.getElementById('f-arr-no').innerText = f.arrNo;
+                document.getElementById('f-arr-time').innerText = f.arrTime; document.getElementById('f-arr-arr-time').innerText = f.arrArrTime;
+
                 const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
                 db.itinerary.forEach((it, idx) => {
-                    itList.innerHTML += `<div onclick="viewDetail(${idx})" class="card p-6 border-l-[8px] border-amber-400 active:scale-98 transition-all text-left"><span class="font-black text-stone-300 uppercase">${it.date} ${it.time}</span><h3 class="font-black text-gray-800 mt-1">${it.title}</h3><p class="text-blue-500 font-bold mt-1">${it.location}</p></div>`;
+                    let driveHtml = "";
+                    if (it.driveTime) {
+                        driveHtml = `<div class="drive-line"><div class="drive-tag"><i class="fa-solid fa-car"></i> ${it.driveTime}</div></div>`;
+                    }
+                    itList.innerHTML += `${driveHtml}<div onclick="viewDetail(${idx})" class="card p-6 border-l-[8px] border-amber-400 active:scale-98 transition-all">
+                        <span class="font-black text-stone-300 uppercase">${it.date} ${it.time}</span>
+                        <h3 class="font-black text-gray-800 mt-1">${it.title || '(未填寫行程)'}</h3>
+                        <p class="text-blue-500 font-bold mt-1">${it.location || ''}</p>
+                    </div>`;
                 });
+
                 const rate = db.rate || 0.21; let total = 0; const payerTotals = {}; db.payers.forEach(p => payerTotals[p] = 0);
                 document.getElementById('expList').innerHTML = db.expenses.slice().reverse().map((e, idx) => {
                     total += e.cost; if(payerTotals.hasOwnProperty(e.payer)) payerTotals[e.payer] += e.cost;
-                    return `<div class="card p-4 flex justify-between items-center text-left"><div><p class="font-black">${e.name}</p><p class="text-gray-400">${Math.round(e.cost * rate).toLocaleString()} • ${e.payer}</p></div><div class="flex items-center gap-3"><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span><button onclick="delExp(${db.expenses.length - 1 - idx})" class="text-stone-200 text-2xl">×</button></div></div>`;
+                    return `<div class="card p-4 flex justify-between items-center"><div><p class="font-black">${e.name}</p><p class="text-gray-400">${Math.round(e.cost * rate).toLocaleString()} • ${e.payer}</p></div><div class="flex items-center gap-3"><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span><button onclick="delExp(${db.expenses.length - 1 - idx})" class="text-stone-200 text-2xl">×</button></div></div>`;
                 }).join('');
                 document.getElementById('totalSpend').innerText = total.toLocaleString();
                 document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
                 document.getElementById('payerStats').innerHTML = Object.entries(payerTotals).map(([p, val]) => `<div class="bg-white p-2 rounded-2xl border text-center"><p class="text-stone-400 text-[10px] uppercase">${p}</p><p class="font-black">¥${val.toLocaleString()}</p></div>`).join('');
                 document.getElementById('expPayer').innerHTML = db.payers.map(p => `<option value="${p}">${p}</option>`).join('');
                 document.getElementById('payerManagerList').innerHTML = db.payers.map((p, idx) => `<div class="bg-stone-100 px-4 py-1 rounded-full flex items-center gap-2 mr-2 mb-2">${p} <button onclick="delPayerName(${idx})" class="text-stone-300">×</button></div>`).join('');
-                renderCheckList('bring', db.checkBring, 'bringList');
-                renderCheckList('buy', db.checkBuy, 'buyList');
-            } catch(e) { console.error(e); }
+                renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
+            } catch(e) {}
         }
 
-        function renderCheckList(type, list, containerId) { 
-            document.getElementById(containerId).innerHTML = list.map((item, idx) => `<div class="list-row"><div class="list-content" onclick="toggleCheck('${type}',${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-stone-100'} text-3xl flex-shrink-0"></i><span class="list-text ${item.done ? 'line-through text-stone-300' : ''}">${item.text}</span></div><button class="list-del-btn" onclick="delItem('${type}',${idx})">×</button></div>`).join(''); 
-        }
-
-        async function updateWeather() {
-            const container = document.getElementById('weatherContainer'); container.innerHTML = '<p class="w-full text-center py-2">更新中...</p>';
-            try {
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1");
-                const data = await res.json(); const now = new Date().getHours(); let html = '';
-                for(let i=0; i<6; i++){
-                    const tIdx = (now + i) % 24; const temp = Math.round(data.hourly.temperature_2m[tIdx]);
-                    html += `<div class="weather-item"><p class="font-black opacity-30">${tIdx}:00</p><i class="fa-solid fa-cloud text-2xl my-2"></i><p class="font-black">${temp}°</p></div>`;
-                }
-                container.innerHTML = html;
-            } catch(e) { container.innerHTML = '<p class="text-red-400 w-full text-center">失敗</p>'; }
-        }
-
+        function renderCheckList(type, list, containerId) { document.getElementById(containerId).innerHTML = list.map((item, idx) => `<div class="list-row"><div class="list-content" onclick="toggleCheck('${type}',${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-stone-100'} text-3xl flex-shrink-0"></i><span class="list-text ${item.done ? 'line-through text-stone-300' : ''}">${item.text}</span></div><button class="list-del-btn" onclick="delItem('${type}',${idx})">×</button></div>`).join(''); }
         function viewDetail(idx) {
             const it = db.itinerary[idx];
-            document.getElementById('viewContent').innerHTML = `<p class="text-stone-300 font-black uppercase">${it.date} ${it.time}</p><h2 class="text-2xl font-black mb-4">${it.title}</h2><p class="text-blue-500 font-bold mb-6">${it.location}</p><div class="bg-stone-50 p-6 rounded-3xl text-lg">${(it.note || '無備註').replace(/\n/g, '<br>')}</div>`;
+            document.getElementById('viewContent').innerHTML = `<p class="text-stone-300 font-black uppercase">${it.date} ${it.time}</p><h2 class="text-2xl font-black mb-4">${it.title || '未命名的行程'}</h2><p class="text-blue-500 font-bold mb-6">${it.location || '無地點資訊'}</p><div class="bg-stone-50 p-6 rounded-3xl text-lg">${(it.note || '無備註').replace(/\n/g, '<br>')}</div>`;
             document.getElementById('viewMapBtn').onclick = () => window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(it.location));
             document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); };
             document.getElementById('viewDelBtn').onclick = () => { if(confirm("確定刪除？")) { db.itinerary.splice(idx,1); pushData(); closeModal('viewModal'); }};
             openModal('viewModal');
         }
 
-        function openAddItinerary() { document.getElementById('itIdx').value = -1; document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); openModal('itineraryModal'); }
+        function openAddItinerary() { document.getElementById('itIdx').value = "-1"; document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); openModal('itineraryModal'); }
         function openEditItinerary(idx) { 
             const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; 
             document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; 
-            document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; 
-            document.getElementById('itNote').value = it.note || ''; openModal('itineraryModal'); 
+            document.getElementById('itDrive').value = it.driveTime || ""; document.getElementById('itHeading').value = it.title || ""; 
+            document.getElementById('itLoc').value = it.location || ""; document.getElementById('itNote').value = it.note || ""; openModal('itineraryModal'); 
         }
         async function saveItinerary() {
-            const idx = parseInt(document.getElementById('itIdx').value);
-            const data = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, note: document.getElementById('itNote').value };
-            if(idx === -1) db.itinerary.push(data); else db.itinerary[idx] = data;
+            const idx = document.getElementById('itIdx').value;
+            const data = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, driveTime: document.getElementById('itDrive').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, note: document.getElementById('itNote').value };
+            if(idx === "-1") db.itinerary.push(data); else db.itinerary[idx] = data;
             db.itinerary.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time)); closeModal('itineraryModal'); await pushData();
         }
 
+        function openPassengerList() { renderPsgrList(); openModal('psgrListModal'); }
+        function renderPsgrList() { document.getElementById('psgrContainer').innerHTML = db.passengers.map((p, idx) => `<div onclick="openPsgrEdit(${idx})" class="p-4 border border-stone-100 rounded-2xl bg-stone-50/50 active:bg-amber-50"><p class="font-black text-gray-800 text-lg">${p.name}</p><p class="text-amber-600 font-bold tracking-widest text-sm">${p.pnr}</p><div class="flex gap-4 text-stone-400 text-xs mt-2 font-bold"><span>座: ${p.seat}</span><span>餐: ${p.meal}</span></div></div>`).join(''); }
+        function openPsgrEdit(idx) { const p = db.passengers[idx]; document.getElementById('edit-psgr-idx').value = idx; document.getElementById('edit-psgr-name').value = p.name; document.getElementById('edit-psgr-pnr').value = p.pnr; document.getElementById('edit-psgr-seat').value = p.seat; document.getElementById('edit-psgr-meal').value = p.meal; openModal('psgrEditModal'); }
+        async function savePassengerData() { const idx = document.getElementById('edit-psgr-idx').value; db.passengers[idx] = { name: document.getElementById('edit-psgr-name').value, pnr: document.getElementById('edit-psgr-pnr').value, seat: document.getElementById('edit-psgr-seat').value, meal: document.getElementById('edit-psgr-meal').value }; closeModal('psgrEditModal'); renderPsgrList(); await pushData(); }
+        function openFlightEdit() { const f = db.flightMain; document.getElementById('in-airline').value = f.airline; document.getElementById('in-dep-from').value = f.depFrom; document.getElementById('in-dep-to').value = f.depTo; document.getElementById('in-dep-date').value = f.depDate; document.getElementById('in-dep-no').value = f.depNo; document.getElementById('in-dep-time').value = f.depTime; document.getElementById('in-dep-arr-time').value = f.depArrTime; document.getElementById('in-arr-from').value = f.arrFrom; document.getElementById('in-arr-to').value = f.arrTo; document.getElementById('in-arr-date').value = f.arrDate; document.getElementById('in-arr-no').value = f.arrNo; document.getElementById('in-arr-time').value = f.arrTime; document.getElementById('in-arr-arr-time').value = f.arrArrTime; openModal('flightEditModal'); }
+        async function saveFlightMain() { db.flightMain = { airline: document.getElementById('in-airline').value, depFrom: document.getElementById('in-dep-from').value, depTo: document.getElementById('in-dep-to').value, depDate: document.getElementById('in-dep-date').value, depNo: document.getElementById('in-dep-no').value, depTime: document.getElementById('in-dep-time').value, depArrTime: document.getElementById('in-dep-arr-time').value, arrFrom: document.getElementById('in-arr-from').value, arrTo: document.getElementById('in-arr-to').value, arrDate: document.getElementById('in-arr-date').value, arrNo: document.getElementById('in-arr-no').value, arrTime: document.getElementById('in-arr-time').value, arrArrTime: document.getElementById('in-arr-arr-time').value }; closeModal('flightEditModal'); await pushData(); }
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         async function addItem(type) { const inp = document.getElementById(type === 'bring' ? 'bringInput' : 'buyInput'); if(inp.value) { (type === 'bring' ? db.checkBring : db.checkBuy).push({text: inp.value, done: false}); inp.value = ''; await pushData(); } }
@@ -232,23 +200,9 @@
         async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); await pushData(); } }
         function delPayerName(idx) { if(confirm("刪除？")) { db.payers.splice(idx,1); saveLocal(); renderAll(); } }
         function saveSettingsOnly() { db.rate = parseFloat(document.getElementById('exRate').value); saveLocal(); renderAll(); }
-        
-        // 核心修正：強制清空並重整
-        async function resetToDefault() {
-            if(confirm("警告：這將清空所有自定義行程並恢復為預設 7 天資料，確定嗎？")) {
-                localStorage.removeItem(DB_KEY); // 先殺死本地暫存
-                db = JSON.parse(JSON.stringify(masterData));
-                saveLocal();
-                alert("已重置資料，網頁即將重整。");
-                location.reload(); // 強制刷頁面來喚醒所有 JavaScript
-            }
-        }
-        
+        async function resetToDefault() { if(confirm("確定恢復備份並強制重整？")) { localStorage.removeItem(DB_KEY); alert("已重置，網頁即將重整"); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
-        function openFlightModal() { renderPassengerCards(); openModal('flightModal'); }
-        function renderPassengerCards() { document.getElementById('psgrCardList').innerHTML = db.passengers.map((p, idx) => `<div class="card p-4 text-left"><p class="font-black text-amber-600">${p.name}</p><p class="text-gray-400">PNR: ${p.dep.pnr}</p></div>`).join(''); }
-
         init();
     </script>
 </body>
