@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>v8.8</title>
+    <title>v8.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,35 +11,26 @@
         :root { --n-gold: #E6B422; --n-miso: #8D6E63; --n-paper: #FDFBF7; }
         body { font-size: 16px; font-family: 'Noto Sans TC', sans-serif; background-color: var(--n-paper); color: #1F2937; text-align: left; margin: 0; }
         p, span, div, input, button, label, select, textarea { font-size: 14px !important; }
-        
         .card { background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 12px; border: 1px solid rgba(230,180,34,0.15); overflow: hidden; }
         .muji-btn { background: linear-gradient(135deg, var(--n-miso) 0%, #6D4C41 100%); color: white; padding: 16px; border-radius: 18px; font-weight: 700; text-align: center; cursor: pointer; border: none; width: 100%; display: block; }
-        
         .page { display: none; padding-bottom: 150px; }
         .page.active { display: block; }
         .nav-active { color: var(--n-miso) !important; font-weight: 900 !important; }
-
-        /* 車程顯示樣式：顯示在卡片下方 */
         .drive-container { margin-left: 32px; margin-top: -8px; margin-bottom: 16px; border-left: 2px dashed #D1D5DB; padding: 12px 0 12px 20px; }
         .drive-tag { background: #F3F4F6; color: #6B7280; font-weight: 900; padding: 4px 12px; border-radius: 99px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; }
-
-        /* 清單對齊 */
         .list-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03); }
         .list-content { display: flex; align-items: center; gap: 16px; flex-grow: 1; min-width: 0; cursor: pointer; }
         .list-text { font-weight: 700; color: #4B5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
         .list-del-btn { flex-shrink: 0; color: #D1D5DB; padding: 0 10px; font-size: 24px !important; }
-
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; }
         .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.8); padding: 10px 5px; border-radius: 18px; border: 1px solid rgba(230,180,34,0.1); }
-
         input, select, textarea { width: 100%; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; margin-bottom: 10px; outline: none; background: #fff; box-sizing: border-box; }
     </style>
 </head>
 <body class="max-w-md mx-auto min-h-screen relative">
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
-    
     <header class="p-6 pt-10 flex justify-between items-center text-left">
-        <div><h1 class="text-2xl font-black text-gray-800">名古屋旅程</h1><p class="text-stone-400 font-bold text-[10px]">v8.8</p></div>
+        <div><h1 class="text-2xl font-black text-gray-800">名古屋旅程</h1><p class="text-stone-400 font-bold text-[10px]">v8.9</p></div>
         <button onclick="pullData()" class="text-stone-300 text-3xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
@@ -111,131 +102,11 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
-        const DB_KEY = 'vina_travel_v8_8';
+        const DB_KEY = 'vina_travel_v8_9';
         const WEATHER_CACHE_KEY = 'vina_weather_cache';
         const masterData = {
-            flightMain: { airline: "星宇航空", depFrom: "TPE", depTo: "NGO", depDate: "05/23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", arrFrom: "NGO", arrTo: "TPE", arrDate: "05/29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30" },
+            flightMain: { airline: "星宇航空", depFrom: "TPE", depTo: "NGO", depDate: "2026-05-23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", arrFrom: "NGO", arrTo: "TPE", arrDate: "2026-05-29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30" },
             passengers: Array(5).fill().map((_, i) => ({ name: "旅客 " + (i+1), pnr: "VINA88", seat: "--", meal: "--" })),
             itinerary: [
                 { date: "2026-05-23", time: "15:30", driveTime: "45min", title: "抵達機場 & 取車", location: "中部國際機場(NGO)", note: "" },
-                { date: "2026-05-23", time: "18:30", driveTime: "", title: "入住 & 味噌豬排", location: "矢場とん 栄瓦町店", note: "" },
-                { date: "2026-05-24", time: "11:00", driveTime: "", title: "樂高樂園", location: "LEGOLAND Japan", note: "" },
-                { date: "2026-05-25", time: "11:00", driveTime: "", title: "磁浮鐵道館", location: "SCMAGLEV Park", note: "" },
-                { date: "2026-05-26", time: "11:00", driveTime: "40min", title: "麵包超人樂園", location: "長島度假村", note: "" },
-                { date: "2026-05-27", time: "11:00", driveTime: "", title: "名古屋港水族館", location: "名古屋港水族館", note: "" },
-                { date: "2026-05-28", time: "11:00", driveTime: "", title: "豐田技術館", location: "トヨタ産業技術記念館", note: "" },
-                { date: "2026-05-29", time: "11:00", driveTime: "", title: "最後採買 & 還車", location: "中部國際機場", note: "" }
-            ],
-            checkBring: [{text:"護照", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
-        };
-        let db = JSON.parse(JSON.stringify(masterData));
-
-        function switchPage(p) { document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.getElementById('page-' + p).classList.add('active'); document.querySelectorAll('nav button').forEach(el => el.classList.remove('nav-active')); document.getElementById('nav-' + p).classList.add('nav-active'); }
-        function init() { try { const local = localStorage.getItem(DB_KEY); if (local) db = JSON.parse(local); const wCache = localStorage.getItem(WEATHER_CACHE_KEY); if(wCache) document.getElementById('weatherContainer').innerHTML = wCache; renderAll(); } catch(e) { renderAll(); } }
-        async function pullData() { showSync(true); try { const res = await fetch(GOOGLE_SCRIPT_URL); const data = await res.json(); if(data && data.itinerary) { db = data; saveLocal(); renderAll(); toast("🏮 同步成功"); } } catch (e) { toast("同步失敗"); } showSync(false); }
-        async function pushData() { showSync(true); saveLocal(); renderAll(); try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} showSync(false); }
-        function saveLocal() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-
-        function renderAll() {
-            try {
-                const f = db.flightMain;
-                document.getElementById('f-airline').innerText = f.airline;
-                document.getElementById('f-dep-from').innerText = f.depFrom; document.getElementById('f-dep-to').innerText = f.depTo;
-                document.getElementById('f-dep-date').innerText = f.depDate.replace('2026-', ''); 
-                document.getElementById('f-dep-no').innerText = f.depNo;
-                document.getElementById('f-dep-time').innerText = f.depTime; document.getElementById('f-dep-arr-time').innerText = f.depArrTime;
-                document.getElementById('f-arr-from').innerText = f.arrFrom; document.getElementById('f-arr-to').innerText = f.arrTo;
-                document.getElementById('f-arr-date').innerText = f.arrDate.replace('2026-', ''); 
-                document.getElementById('f-arr-no').innerText = f.arrNo;
-                document.getElementById('f-arr-time').innerText = f.arrTime; document.getElementById('f-arr-arr-time').innerText = f.arrArrTime;
-
-                // 排序邏輯：使用標準化日期時間
-                db.itinerary.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
-
-                const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
-                db.itinerary.forEach((it, idx) => {
-                    itList.innerHTML += `<div onclick="viewDetail(${idx})" class="card p-6 border-l-[8px] border-amber-400">
-                        <span class="font-black text-stone-300 uppercase">${it.date.replace('2026-', '')} ${it.time}</span>
-                        <h3 class="font-black text-gray-800 mt-1">${it.title || '(未命名)'}</h3>
-                        <p class="text-blue-500 font-bold mt-1">${it.location || ''}</p>
-                    </div>`;
-                    
-                    // 車程邏輯：顯示在出發點下方，最後一項隱藏
-                    if (it.driveTime && idx < db.itinerary.length - 1) {
-                        itList.innerHTML += `<div class="drive-container"><div class="drive-tag"><i class="fa-solid fa-car"></i> ${it.driveTime}</div></div>`;
-                    }
-                });
-                
-                const rate = db.rate || 0.21; let total = 0; const ps = {}; db.payers.forEach(p => ps[p] = 0);
-                document.getElementById('expList').innerHTML = db.expenses.slice().reverse().map((e, i) => { total += e.cost; if(ps.hasOwnProperty(e.payer)) ps[e.payer] += e.cost; return `<div class="card p-4 flex justify-between items-center"><div><p class="font-black">${e.name}</p><p class="text-gray-400">${Math.round(e.cost * rate)} • ${e.payer}</p></div><div class="flex items-center gap-3"><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span><button onclick="delExp(${db.expenses.length - 1 - i})" class="text-stone-200">×</button></div></div>`; }).join('');
-                document.getElementById('totalSpend').innerText = total.toLocaleString(); document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
-                document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `<div class="bg-white p-2 rounded-2xl border text-center"><p class="text-stone-400 text-[10px] uppercase">${p}</p><p class="font-black">¥${v.toLocaleString()}</p></div>`).join('');
-                document.getElementById('expPayer').innerHTML = db.payers.map(p => `<option value="${p}">${p}</option>`).join('');
-                document.getElementById('payerManagerList').innerHTML = db.payers.map((p, i) => `<div class="bg-stone-100 px-4 py-1 rounded-full mr-2 mb-2">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
-                renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
-            } catch(e) {}
-        }
-
-        async function updateWeather() {
-            document.getElementById('weatherContainer').innerHTML = '<p class="w-full text-center py-2">更新中...</p>';
-            try {
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1");
-                const data = await res.json(); const now = new Date().getHours(); let html = '';
-                for(let i=0; i<6; i++){ const tIdx = (now + i) % 24; const temp = Math.round(data.hourly.temperature_2m[tIdx]); html += `<div class="weather-item"><p class="font-black opacity-30">${tIdx}:00</p><i class="fa-solid fa-cloud text-2xl my-2"></i><p class="font-black">${temp}°</p></div>`; }
-                document.getElementById('weatherContainer').innerHTML = html; localStorage.setItem(WEATHER_CACHE_KEY, html);
-            } catch(e) { toast("氣象更新失敗"); }
-        }
-
-        function openAddItinerary() { 
-            document.getElementById('itIdx').value = "-1";
-            document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); 
-            openModal('itineraryModal'); 
-        }
-
-        function openEditItinerary(idx) { 
-            const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; 
-            document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; 
-            document.getElementById('itDrive').value = it.driveTime || ""; document.getElementById('itHeading').value = it.title || ""; 
-            document.getElementById('itLoc').value = it.location || ""; document.getElementById('itNote').value = it.note || ""; openModal('itineraryModal'); 
-        }
-
-        async function saveItinerary() {
-            const idx = document.getElementById('itIdx').value;
-            const data = { date: document.getElementById('itDate').value, time: document.getElementById('itTime').value, driveTime: document.getElementById('itDrive').value, title: document.getElementById('itHeading').value, location: document.getElementById('itLoc').value, note: document.getElementById('itNote').value };
-            if(idx === "-1") { db.itinerary.push(data); } else { db.itinerary[idx] = data; }
-            closeModal('itineraryModal'); await pushData();
-        }
-
-        function viewDetail(idx) {
-            const it = db.itinerary[idx];
-            document.getElementById('viewContent').innerHTML = `<p class="text-stone-300 font-black uppercase">${it.date.replace('2026-', '')} ${it.time}</p><h2 class="text-2xl font-black mb-4">${it.title || '行程'}</h2><p class="text-blue-500 font-bold mb-6">${it.location || ''}</p><div class="bg-stone-50 p-6 rounded-3xl text-lg">${(it.note || '').replace(/\n/g, '<br>')}</div>`;
-            document.getElementById('viewMapBtn').onclick = () => window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(it.location));
-            document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); };
-            document.getElementById('viewDelBtn').onclick = () => { if(confirm("刪除？")) { db.itinerary.splice(idx,1); pushData(); closeModal('viewModal'); }};
-            openModal('viewModal');
-        }
-
-        function openPassengerList() { renderPsgrList(); openModal('psgrListModal'); }
-        function renderPsgrList() { document.getElementById('psgrContainer').innerHTML = db.passengers.map((p, i) => `<div onclick="openPsgrEdit(${i})" class="p-4 border border-stone-100 rounded-2xl bg-stone-50/50"><p class="font-black text-lg">${p.name}</p><p class="text-amber-600 font-bold">${p.pnr}</p><div class="flex gap-4 text-stone-400 text-xs mt-2 font-bold"><span>座: ${p.seat}</span><span>餐: ${p.meal}</span></div></div>`).join(''); }
-        function openPsgrEdit(i) { const p = db.passengers[i]; document.getElementById('edit-psgr-idx').value = i; document.getElementById('edit-psgr-name').value = p.name; document.getElementById('edit-psgr-pnr').value = p.pnr; document.getElementById('edit-psgr-seat').value = p.seat; document.getElementById('edit-psgr-meal').value = p.meal; openModal('psgrEditModal'); }
-        async function savePassengerData() { const i = document.getElementById('edit-psgr-idx').value; db.passengers[i] = { name: document.getElementById('edit-psgr-name').value, pnr: document.getElementById('edit-psgr-pnr').value, seat: document.getElementById('edit-psgr-seat').value, meal: document.getElementById('edit-psgr-meal').value }; closeModal('psgrEditModal'); renderPsgrList(); await pushData(); }
-        function openFlightEdit() { const f = db.flightMain; document.getElementById('in-airline').value = f.airline; document.getElementById('in-dep-from').value = f.depFrom; document.getElementById('in-dep-to').value = f.depTo; document.getElementById('in-dep-date').value = f.depDate; document.getElementById('in-dep-no').value = f.depNo; document.getElementById('in-dep-time').value = f.depTime; document.getElementById('in-dep-arr-time').value = f.depArrTime; document.getElementById('in-arr-from').value = f.arrFrom; document.getElementById('in-arr-to').value = f.arrTo; document.getElementById('in-arr-date').value = f.arrDate; document.getElementById('in-arr-no').value = f.arrNo; document.getElementById('in-arr-time').value = f.arrTime; document.getElementById('in-arr-arr-time').value = f.arrArrTime; openModal('flightEditModal'); }
-        async function saveFlightMain() { db.flightMain = { airline: document.getElementById('in-airline').value, depFrom: document.getElementById('in-dep-from').value, depTo: document.getElementById('in-dep-to').value, depDate: document.getElementById('in-dep-date').value, depNo: document.getElementById('in-dep-no').value, depTime: document.getElementById('in-dep-time').value, depArrTime: document.getElementById('in-dep-arr-time').value, arrFrom: document.getElementById('in-arr-from').value, arrTo: document.getElementById('in-arr-to').value, arrDate: document.getElementById('in-arr-date').value, arrNo: document.getElementById('in-arr-no').value, arrTime: document.getElementById('in-arr-time').value, arrArrTime: document.getElementById('in-arr-arr-time').value }; closeModal('flightEditModal'); await pushData(); }
-        function renderCheckList(t, list, cid) { document.getElementById(cid).innerHTML = list.map((item, idx) => `<div class="list-row"><div class="list-content" onclick="toggleCheck('${t}',${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-stone-100'} text-3xl"></i><span class="list-text ${item.done ? 'line-through text-stone-300' : ''}">${item.text}</span></div><button class="list-del-btn" onclick="delItem('${t}',${idx})">×</button></div>`).join(''); }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        async function addItem(t) { const inp = document.getElementById(t + 'Input'); if(inp.value) { db[t === 'bring' ? 'checkBring' : 'checkBuy'].push({text: inp.value, done: false}); inp.value = ''; await pushData(); } }
-        async function toggleCheck(t, i) { const list = db[t === 'bring' ? 'checkBring' : 'checkBuy']; list[i].done = !list[i].done; await pushData(); }
-        async function delItem(t, i) { db[t === 'bring' ? 'checkBring' : 'checkBuy'].splice(i, 1); await pushData(); }
-        async function addExp() { const n = document.getElementById('expName').value, c = parseFloat(document.getElementById('expCost').value), p = document.getElementById('expPayer').value; if(n && c) { db.expenses.push({name: n, cost: c, payer: p}); await pushData(); } }
-        async function delExp(i) { db.expenses.splice(i, 1); await pushData(); }
-        async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); await pushData(); } }
-        function delPayerName(i) { if(confirm("刪？")) { db.payers.splice(i,1); saveLocal(); renderAll(); } }
-        function saveSettingsOnly() { db.rate = parseFloat(document.getElementById('exRate').value); saveLocal(); renderAll(); }
-        async function resetToDefault() { if(confirm("重置手機暫存？")) { localStorage.removeItem(DB_KEY); localStorage.removeItem(WEATHER_CACHE_KEY); location.reload(); } }
-        function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
-        function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
-        init();
-    </script>
-</body>
-</html>
+                { date: "2026-05-23", time: "18:30", driveTime: "", title
