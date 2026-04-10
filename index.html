@@ -28,11 +28,27 @@
             border-radius: 20px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* 1.3 白霧感導航列 */
+        /* 1.3 導航列：深藍夜空磨砂感 */
         nav { 
-            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-top: 1px solid rgba(255, 255, 255, 0.2); z-index: 100;
+            /* 使用帶有高度透明感的深靛藍色 (Midnight Blue) */
+            background: rgba(10, 25, 47, 0.82); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            /* 邊框改為極淡的白色，像細微的月光邊緣 */
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            z-index: 100; 
         }
+
+        /* 額外建議：調整未選中按鈕的亮度，確保在深藍底色上依然清晰 */
+        nav button {
+            color: rgba(255, 255, 255, 0.5) !important; /* 從 0.4 提升到 0.5 */
+        }
+
+        /* 選中狀態（金鯱黃）在深藍底色上會非常亮眼，維持原樣即可 */
+        .nav-active { 
+            color: var(--n-gold) !important; 
+        }
+
 
         .is-past { filter: grayscale(100%) opacity(0.5); transform: scale(0.98); }
         .muji-btn { background: linear-gradient(135deg, #8D6E63 0%, #5D4037 100%); color: white; padding: 16px; border-radius: 18px; font-weight: 700; text-align: center; border: none; width: 100%; display: block; cursor: pointer; }
@@ -65,7 +81,7 @@
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
     <header class="pt-10 pb-6 flex justify-between items-center">
-        <div class="flex items-center gap-3"><h1 class="text-2xl font-black text-white">名古屋旅程</h1><i class="fa-solid fa-fish-fins text-blue-400 text-2xl rotate-45"></i></div>
+        <div class="flex items-center gap-3"><h1 class="text-2xl font-black text-black">名古屋旅程</h1><i class="fa-solid fa-fish-fins text-blue-400 text-2xl rotate-45"></i></div>
         <button onclick="pullData()" class="text-white/30 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
