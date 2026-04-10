@@ -75,13 +75,22 @@
             width: 100%; 
             flex-wrap: nowrap; /* 強制不換行，解決 x 掉下去的問題 */
         }
+        /* 標題專用：軟陰影與高級質感 */
+        .title-glow {
+            /* 第一層：環境光暈，第二層：輪廓強化 */
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(10, 25, 47, 0.9);
+            letter-spacing: 0.15em; /* 增加字間距，營造高級感 */
+        }
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
     <header class="pt-10 pb-6 flex justify-between items-center">
-        <div class="flex items-center gap-3"><h1 class="text-2xl font-black text-black">名古屋旅程</h1><i class="fa-solid fa-fish-fins text-blue-400 text-2xl rotate-45"></i></div>
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-black text-white title-glow">名古屋旅程</h1>
+            <i class="fa-solid fa-fish-fins text-amber-400 text-2xl rotate-45"></i>
+        </div>
         <button onclick="pullData()" class="text-white/30 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
