@@ -194,10 +194,10 @@
             const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
             db.itinerary.forEach((it, idx) => {
                 const isPast = it.date < todayStr ? "is-past" : "";
-                itList.innerHTML += `<div onclick="viewDetail(${idx})" class="glass-card p-6 border-l-[8px] border-amber-400 ${isPast}">
-                    <span class="font-black text-gray-500 uppercase text-[14px]">${it.date.replace('2026-', '')} ${it.time}</span>
-                    <h3 class="font-black text-gray-800 mt-1 text-[18px]">${it.title || '(未命名)'}</h3>
-                    <p class="text-blue-600 font-bold mt-1 text-[14px]">${it.location || ''}</p></div>`;
+                itList.innerHTML += `<div onclick="viewDetail(${idx})" class="glass-card p-4 bg-white/40 border-l-[8px] border-amber-400 ${isPast}">
+                    <span class="font-black text-gray-500 uppercase text-[16px]">${it.date.replace('2026-', '')} ${it.time}</span>
+                    <h3 class="font-black text-gray-800 mt-1 text-[22px]">${it.title || '(未命名)'}</h3>
+                    <p class="text-blue-600 font-bold mt-1 text-[16px]">${it.location || ''}</p></div>`;
                 if (it.driveTime && idx < db.itinerary.length - 1) {
                     itList.innerHTML += `<div class="drive-container ${isPast}"><div class="drive-tag"><i class="fa-solid fa-car"></i> ${it.driveTime}</div></div>`;
                 }
