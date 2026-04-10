@@ -203,6 +203,15 @@
                 }
             });
 
+            renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
+            const rate = db.rate || 0.21; let total = 0; const ps = {}; (db.payers||[]).forEach(p => ps[p] = 0);
+            document.getElementById('expList').innerHTML = (db.expenses||[]).slice().reverse().map((e, i) => { total += e.cost; ps[e.payer] += e.cost; return `<div class="glass-card p-4 flex justify-between items-center text-gray-800"><div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span></div>`; }).join('');
+            document.getElementById('totalSpend').innerText = total.toLocaleString(); document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
+            document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `<div class="bg-white/10 p-2 rounded-2xl text-center"><p class="opacity-40 text-[12px] uppercase">${p}</p><p class="font-black">¥${v.toLocaleString()}</p></div>`).join('');
+            document.getElementById('expPayer').innerHTML = (db.payers||[]).map(p => `<option value="${p}">${p}</option>`).join('');
+            document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `<div class="bg-white/10 px-4 py-1 rounded-full text-base text-white">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
+        }
+
 function renderCheckList(t, list, cid) { 
             const container = document.getElementById(cid);
             if (!container) return;
@@ -218,8 +227,6 @@ function renderCheckList(t, list, cid) {
                     </button>
                 </div>`).join(''); 
         }
-
-        function renderCheckList(t, list, cid) { document.getElementById(cid).innerHTML = list.map((item, idx) => `<div class="list-row"><div class="flex items-center gap-4 flex-grow" onclick="toggleCheck('${t}',${idx})"><i class="fa-solid ${item.done ? 'fa-square-check text-blue-500' : 'fa-square text-white/20'} text-2xl"></i><span class="${item.done ? 'opacity-30 line-through' : 'font-bold'}">${item.text}</span></div><button onclick="delItem('${t}',${idx})" class="opacity-20 ml-4">×</button></div>`).join(''); }
         async function updateWeather() { try { const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1"); const data = await res.json(); const now = new Date().getHours(); let html = ''; for(let i=0; i<6; i++){ const tIdx = (now + i) % 24; html += `<div class="weather-item"><p class="opacity-40 text-[12px]">${tIdx}:00</p><i class="fa-solid fa-cloud text-xl my-1"></i><p class="font-black">${Math.round(data.hourly.temperature_2m[tIdx])}°</p></div>`; } document.getElementById('weatherContainer').innerHTML = html; } catch(e){} }
         function viewDetail(idx) { const it = db.itinerary[idx]; document.getElementById('viewContent').innerHTML = `<p class="opacity-40 font-black uppercase">${it.date.replace('2026-', '')} ${it.time}</p><h2 class="text-2xl font-black mb-2">${it.title}</h2><p class="text-blue-600 font-bold mb-6">${it.location}</p><div class="bg-stone-50 p-6 rounded-3xl text-lg">${(it.note || '').replace(/\n/g, '<br>')}</div>`; document.getElementById('viewMapBtn').onclick = () => window.open("http://maps.google.com/?q=" + encodeURIComponent(it.location)); document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); }; document.getElementById('viewDelBtn').onclick = () => { db.itinerary.splice(idx,1); pushData(); closeModal('viewModal'); }; openModal('viewModal'); }
         function openEditItinerary(idx) { const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; document.getElementById('itDrive').value = it.driveTime; document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; document.getElementById('itNote').value = it.note; openModal('itineraryModal'); }
