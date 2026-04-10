@@ -85,7 +85,7 @@
                 </div>
             </div>
             <div class="glass-card p-4 bg-white/10 border-none mt-4">
-                <div class="flex justify-between items-center mb-3"><span class="font-black text-white/50 text-[14px]">WEATHER (6H)</span><button onclick="updateWeather()" class="text-blue-400 font-bold text-[14px]">更新</button></div>
+                <div class="flex justify-between items-center mb-3"><span class="font-black text-white/400 text-[14px]">WEATHER (6H)</span><button onclick="updateWeather()" class="text-blue-400 font-bold text-[14px]">更新</button></div>
                 <div id="weatherContainer" class="weather-scroll text-white"><p class="w-full text-center opacity-40 py-2 text-sm">按更新載入...</p></div>
             </div>
             <button onclick="openAddItinerary()" class="muji-btn my-4 shadow-xl">＋ 新增行程項目</button>
@@ -227,7 +227,11 @@ function renderCheckList(t, list, cid) {
                     </button>
                 </div>`).join(''); 
         }
-        async function updateWeather() { try { const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1"); const data = await res.json(); const now = new Date().getHours(); let html = ''; for(let i=0; i<6; i++){ const tIdx = (now + i) % 24; html += `<div class="weather-item"><p class="opacity-40 text-[12px]">${tIdx}:00</p><i class="fa-solid fa-cloud text-xl my-1"></i><p class="font-black">${Math.round(data.hourly.temperature_2m[tIdx])}°</p></div>`; } document.getElementById('weatherContainer').innerHTML = html; } catch(e){} }
+        async function updateWeather() { try { const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1"); const data = await res.json(); const now = new Date().getHours(); let html = ''; for(let i=0; i<6; i++){ const tIdx = (now + i) % 24; html += `<div class="weather-item">
+            <p class="text-white font-bold text-[11px] mb-1">${tIdx}:00</p>
+            <i class="fa-solid fa-cloud text-xl my-1"></i>
+            <p class="font-black text-white">${Math.round(data.hourly.temperature_2m[tIdx])}°</p>
+         </div>`; } document.getElementById('weatherContainer').innerHTML = html; } catch(e){} }
         function viewDetail(idx) { const it = db.itinerary[idx]; document.getElementById('viewContent').innerHTML = `<p class="opacity-40 font-black uppercase">${it.date.replace('2026-', '')} ${it.time}</p><h2 class="text-2xl font-black mb-2">${it.title}</h2><p class="text-blue-600 font-bold mb-6">${it.location}</p><div class="bg-stone-50 p-6 rounded-3xl text-lg">${(it.note || '').replace(/\n/g, '<br>')}</div>`; document.getElementById('viewMapBtn').onclick = () => window.open("http://maps.google.com/?q=" + encodeURIComponent(it.location)); document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); }; document.getElementById('viewDelBtn').onclick = () => { db.itinerary.splice(idx,1); pushData(); closeModal('viewModal'); }; openModal('viewModal'); }
         function openEditItinerary(idx) { const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; document.getElementById('itDrive').value = it.driveTime; document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; document.getElementById('itNote').value = it.note; openModal('itineraryModal'); }
         function openAddItinerary() { document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); document.getElementById('itIdx').value = "-1"; openModal('itineraryModal'); }
