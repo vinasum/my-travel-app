@@ -232,7 +232,7 @@
             const rate = db.rate || 0.21; let total = 0; const ps = {}; (db.payers||[]).forEach(p => ps[p] = 0);
             document.getElementById('expList').innerHTML = (db.expenses||[]).slice().reverse().map((e, i) => { total += e.cost; ps[e.payer] += e.cost; return `<div class="glass-card p-4 flex justify-between items-center text-gray-800"><div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span></div>`; }).join('');
             document.getElementById('totalSpend').innerText = total.toLocaleString(); document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
-            document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `<div class="glass-card p-6 bg-gray-900/40 rounded-2xl text-center"><p class="opacity-40 text-[12px] uppercase">${p}</p><p class="font-black">¥${v.toLocaleString()}</p></div>`).join('');
+            document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `<div class="bg-white/40 p-4 rounded-2xl text-center"><p class="opacity-40 text-[12px] uppercase">${p}</p><p class="font-black">¥${v.toLocaleString()}</p></div>`).join('');
             document.getElementById('expPayer').innerHTML = (db.payers||[]).map(p => `<option value="${p}">${p}</option>`).join('');
             document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `<div class="bg-white/10 px-4 py-1 rounded-full text-base text-white">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
         }
