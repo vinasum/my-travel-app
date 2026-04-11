@@ -110,7 +110,7 @@
                 </div>
             </div>
             <div class="glass-card p-4 bg-white/40 border-none mt-4">
-                <div class="flex justify-between items-center mb-3"><span class="font-black text-white text-[14px]">WEATHER (6H)</span><button onclick="updateWeather()" class="text-blue-400 font-bold text-[14px]">更新</button></div>
+                <div class="flex justify-between items-center mb-3"><span class="font-black text-white text-[14px]">WEATHER (6H)</span><button onclick="updateWeather()" class="text-blue-600 font-bold text-[16px]">更新</button></div>
                 <div id="weatherContainer" class="weather-scroll text-white"><p class="w-full text-center opacity-40 py-2 text-sm">按更新載入...</p></div>
             </div>
             <button onclick="openAddItinerary()" class="muji-btn my-4 shadow-xl">＋ 新增行程項目</button>
@@ -250,7 +250,7 @@ function renderCheckList(t, list, cid) {
                 <div class="list-row">
                     <div class="flex items-center gap-4 flex-grow overflow-hidden" onclick="toggleCheck('${t}',${idx})">
                         <i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-white/20'} text-2xl flex-shrink-0"></i>
-                        <span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[20px] text-white">${item.text}</span>
+                        <span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[18px] text-white">${item.text}</span>
                     </div>
                     <button onclick="delItem('${t}',${idx})" class="text-white/20 hover:text-red-400 p-2 ml-2 flex-shrink-0">
                         <i class="fa-solid fa-xmark"></i>
