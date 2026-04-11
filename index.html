@@ -101,7 +101,7 @@
         </div>
 
         <div id="page-items" class="page">
-            <h2 class="font-black mb-4 text-xl">清單項目</h2>
+            <h2 class="font-black mb-4 text-xl">清單項目 (不共享)</h2>
             <div class="glass-card-dark border-t-4 border-blue-400">
                 <h3 class="font-black text-blue-300 mb-3 text-base">要攜帶</h3>
                 <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="護照..."><button onclick="addItem('bring')" class="muji-btn w-auto px-6 bg-blue-600">＋</button></div>
@@ -323,8 +323,50 @@ function renderAll() {
         async function addPayerName() { const n = document.getElementById('newPayer').value.trim(); if(n && !db.payers.includes(n)) { db.payers.push(n); document.getElementById('newPayer').value=''; pushData(); } }
         function delPayerName(i) { db.payers.splice(i,1); pushData(); }
         function saveSettingsOnly() { db.rate = parseFloat(document.getElementById('exRate').value); pushData(); }
-        async function pushData() { showSync(true); localStorage.setItem(DB_KEY, JSON.stringify(db)); renderAll(); try { await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(db) }); } catch(e){} showSync(false); }
-        async function pullData() { showSync(true); try { const res = await fetch(GOOGLE_SCRIPT_URL); const data = await res.json(); if(data) { db = data; localStorage.setItem(DB_KEY, JSON.stringify(db)); renderAll(); toast("🏮 同步成功"); } } catch (e) {} showSync(false); }
+async function pushData() {
+    showSync(true);
+    localStorage.setItem(DB_KEY, JSON.stringify(db)); // 所有的資料依然會存在手機裡
+    renderAll();
+
+    try {
+        // --- 核心改動：建立一個「乾淨版」的副本送上雲端 ---
+        const syncData = { ...db };
+        delete syncData.checkBring; // 刪除要攜帶清單，不送去雲端
+        delete syncData.checkBuy;   // 刪除要購買清單，不送去雲端
+        // -------------------------------------------
+
+        await fetch(GOOGLE_SCRIPT_URL, { 
+            method: 'POST', 
+            body: JSON.stringify(syncData) // 只傳送行程和記帳
+        });
+    } catch(e) { console.error(e); }
+    showSync(false);
+}
+        async function pullData() {
+    showSync(true);
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL);
+        const cloudData = await res.json();
+        
+        if(cloudData) {
+            // 先備份本地的清單
+            const localBring = db.checkBring;
+            const localBuy = db.checkBuy;
+
+            // 讀取雲端資料
+            db = Object.assign({}, masterData, cloudData);
+
+            // 把本地備份的清單填回去，防止被雲端覆蓋
+            db.checkBring = localBring;
+            db.checkBuy = localBuy;
+
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            renderAll();
+            toast("🏮 同步成功 (清單維持本地)");
+        }
+    } catch (e) {}
+    showSync(false);
+}
         function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
