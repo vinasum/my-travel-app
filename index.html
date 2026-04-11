@@ -199,7 +199,6 @@
                 toast("👓 進入唯讀觀賞模式");
             }
 
-            const local = localStorage.getItem(DB_KEY); 
             // ... 後續原本的代碼 ...
             const local = localStorage.getItem(DB_KEY); 
             if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
