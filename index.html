@@ -64,6 +64,18 @@
         .day-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0 16px 0; padding: 0 10px; }
         .silver-line { flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, #C0C0C0, transparent); opacity: 0.6; }
         .divider-text { font-size: 10px; font-weight: 900; color: #C0C0C0; letter-spacing: 0.2em; text-transform: uppercase; }
+/* 唯讀模式隱藏規則 */
+        .mode-view .muji-btn, 
+        .mode-view button[onclick*="open"], 
+        .mode-view button[onclick*="addItem"],
+        .mode-view button[onclick*="addExp"],
+        .mode-view .fa-arrows-rotate, /* 隱藏同步按鈕 */
+        .mode-view input, 
+        .mode-view select,
+        .mode-view #viewEditBtn,
+        .mode-view #viewDelBtn {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
@@ -180,6 +192,15 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function init() { 
+// 偵測網址是否有 ?mode=view
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'view') {
+                document.body.classList.add('mode-view');
+                toast("👓 進入唯讀觀賞模式");
+            }
+
+            const local = localStorage.getItem(DB_KEY); 
+            // ... 後續原本的代碼 ...
             const local = localStorage.getItem(DB_KEY); 
             if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
             document.getElementById('exRate').value = db.rate || 0.21;
