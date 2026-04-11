@@ -250,7 +250,7 @@ function renderCheckList(t, list, cid) {
                 <div class="list-row">
                     <div class="flex items-center gap-4 flex-grow overflow-hidden" onclick="toggleCheck('${t}',${idx})">
                         <i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-white/20'} text-2xl flex-shrink-0"></i>
-                        <span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[17px] text-white">${item.text}</span>
+                        <span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[20px] text-white">${item.text}</span>
                     </div>
                     <button onclick="delItem('${t}',${idx})" class="text-white/20 hover:text-red-400 p-2 ml-2 flex-shrink-0">
                         <i class="fa-solid fa-xmark"></i>
