@@ -1,6 +1,6 @@
 {
   "name": "Nagoya Express",
-  "short_name": "Nagoya",
+  "short_name": "Nagoya Trip",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1A2A3A",
