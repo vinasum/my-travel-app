@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nagoya Express v10.7</title>
+    <title>Nagoya Express v11.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,7 +12,6 @@
         
         body { 
             font-size: 16px; font-family: 'Noto Sans TC', sans-serif; background-color: var(--n-wago); 
-            /* 1.1 使用妳提供的背景圖 */
             background-image: url('nagoya sakura bg.jpg');
             background-size: cover; background-attachment: fixed; background-position: center;
             color: #FFFFFF; text-align: left; margin: 0; min-height: 100vh;
@@ -28,59 +27,35 @@
             border-radius: 20px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* 1.3 導航列：深藍夜空磨砂感 */
         nav { 
-            /* 使用帶有高度透明感的深靛藍色 (Midnight Blue) */
             background: rgba(10, 25, 47, 0.82); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
-            /* 邊框改為極淡的白色，像細微的月光邊緣 */
-            border-top: 1px solid rgba(255, 255, 255, 0.1); 
-            z-index: 100; 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; 
         }
-
-        /* 額外建議：調整未選中按鈕的亮度，確保在深藍底色上依然清晰 */
-        nav button {
-            color: rgba(255, 255, 255, 0.5) !important; /* 從 0.4 提升到 0.5 */
-        }
-
-        /* 選中狀態（金鯱黃）在深藍底色上會非常亮眼，維持原樣即可 */
-        .nav-active { 
-            color: var(--n-gold) !important; 
-        }
-
+        nav button { color: rgba(255, 255, 255, 0.5) !important; }
+        .nav-active { color: var(--n-gold) !important; font-weight: 900 !important; }
 
         .is-past { filter: grayscale(100%) opacity(0.5); transform: scale(0.98); }
         .muji-btn { background: linear-gradient(135deg, #8D6E63 0%, #5D4037 100%); color: white; padding: 16px; border-radius: 18px; font-weight: 700; text-align: center; border: none; width: 100%; display: block; cursor: pointer; }
 
-        label { display: block; font-size: 12px; font-weight: 900; color: var(--n-gold); margin-bottom: 4px; margin-top: 8px; }
+        label { display: block; font-size: 16px; font-weight: 900; color: var(--n-gold); margin-bottom: 6px; margin-top: 10px; }
         input, select, textarea { width: 100%; border: 1px solid #ddd !important; border-radius: 16px; padding: 14px; margin-bottom: 10px; outline: none; background: #fff !important; color: #333 !important; font-size: 14px !important; }
 
         .page { display: none; padding-bottom: 150px; }
         .page.active { display: block; }
-        .nav-active { color: var(--n-gold) !important; font-weight: 900 !important; }
         
         .drive-container { margin-left: 32px; margin-top: -8px; margin-bottom: 16px; border-left: 2px dashed rgba(255,255,255,0.3); padding: 12px 0 12px 20px; }
         .drive-tag { background: rgba(255,255,255,0.1); color: #FFF; font-weight: 900; padding: 4px 12px; border-radius: 99px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; }
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; }
         .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999; }
-        /* 清單每一行的容器，確保不換行且對齊 */
-        .list-row { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 12px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            width: 100%; 
-            flex-wrap: nowrap; /* 強制不換行，解決 x 掉下去的問題 */
-        }
-        /* 標題專用：軟陰影與高級質感 */
-        .title-glow {
-            /* 第一層：環境光暈，第二層：輪廓強化 */
-            text-shadow: 0 0 15px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(10, 25, 47, 0.9);
-            letter-spacing: 0.15em; /* 增加字間距，營造高級感 */
-        }
+        
+        .list-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; flex-wrap: nowrap; }
+        .title-glow { text-shadow: 0 0 15px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(10, 25, 47, 0.9); letter-spacing: 0.15em; }
+
+        .day-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0 16px 0; padding: 0 10px; }
+        .silver-line { flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, #C0C0C0, transparent); opacity: 0.6; }
+        .divider-text { font-size: 10px; font-weight: 900; color: #C0C0C0; letter-spacing: 0.2em; text-transform: uppercase; }
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
@@ -120,12 +95,12 @@
         <div id="page-items" class="page">
             <h2 class="font-black mb-4 text-xl">清單項目</h2>
             <div class="glass-card-dark border-t-4 border-blue-400">
-                <h3 class="font-black text-blue-300 mb-3 text-x1">要攜帶</h3>
+                <h3 class="font-black text-blue-300 mb-3 text-xl">要攜帶</h3>
                 <div class="flex gap-2 mb-4"><input id="bringInput" type="text" placeholder="護照..."><button onclick="addItem('bring')" class="muji-btn w-auto px-6 bg-blue-600">＋</button></div>
                 <div id="bringList" class="text-white"></div>
             </div>
             <div class="glass-card-dark mt-4 border-t-4 border-red-400">
-                <h3 class="font-black text-red-300 mb-3 text-x1">要購買</h3>
+                <h3 class="font-black text-red-300 mb-3 text-xl">要購買</h3>
                 <div class="flex gap-2 mb-4"><input id="buyInput" type="text" placeholder="藥妝..."><button onclick="addItem('buy')" class="muji-btn w-auto px-6 bg-red-600">＋</button></div>
                 <div id="buyList" class="text-white"></div>
             </div>
@@ -140,9 +115,9 @@
 
         <div id="page-tools" class="page">
             <h2 class="font-black mb-4 text-xl text-blue-400">設定與管理</h2>
-            <div class="glass-card-dark"><label class="text-base">匯率設定</label><input id="exRate" type="number" step="0.001" onchange="saveSettingsOnly()"></div>
-            <div class="glass-card-dark"><label class="text-base">名單管理</label><div class="flex gap-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2"></div></div>
-            <div class="glass-card-dark"><label class="text-base">數據編輯</label>
+            <div class="glass-card-dark"><label>匯率設定</label><input id="exRate" type="number" step="0.001" onchange="saveSettingsOnly()"></div>
+            <div class="glass-card-dark"><label>名單管理</label><div class="flex gap-2 mb-4"><input id="newPayer" type="text"><button onclick="addPayerName()" class="muji-btn w-auto px-4">+</button></div><div id="payerManagerList" class="flex flex-wrap gap-2"></div></div>
+            <div class="glass-card-dark"><label>數據編輯</label>
                 <button onclick="openFlightEdit()" class="w-full py-4 bg-white/10 rounded-xl font-bold border border-white/10 text-white mb-3">修改航班日期與資訊</button>
                 <button onclick="openPsgrEdit()" class="w-full py-4 bg-white/10 rounded-xl font-bold border border-white/10 text-white">編輯 5 位旅客詳細資料</button>
             </div>
@@ -166,8 +141,9 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
-        const DB_KEY = 'vina_travel_v10_7';
-        // 2.0 預設行程備份點
+        // 重要：固定此 KEY，以後更新程式碼都不會清除手機資料
+        const DB_KEY = 'vina_travel_production_v1';
+        
         const masterData = {
             flightMain: { airline: "星宇航空", depFrom: "TPE", depTo: "NGO", depDate: "2026-05-23", depNo: "JX830", depTime: "10:00", depArrTime: "14:00", arrFrom: "NGO", arrTo: "TPE", arrDate: "2026-05-29", arrNo: "JX831", arrTime: "16:35", arrArrTime: "20:30" },
             passengers: [
@@ -181,13 +157,11 @@
                 { date: "2026-05-23", time: "15:30", driveTime: "45min", title: "抵達 & 取車", location: "中部國際機場(NGO)", note: "需前往租車櫃檯。" },
                 { date: "2026-05-23", time: "18:30", driveTime: "", title: "入住 & 晚餐", location: "武士之家 (Samurai House)", note: "附近有味噌豬排。" },
                 { date: "2026-05-24", time: "10:00", driveTime: "20min", title: "名古屋港水族館", location: "名古屋港水族館", note: "看虎鯨與企鵝遊行。" },
-                { date: "2026-05-24", time: "14:30", driveTime: "", title: "海洋列車樂園", location: "名古屋港シートレインランド", note: "就在水族館旁邊。" },
                 { date: "2026-05-25", time: "10:00", driveTime: "40min", title: "樂高樂園 LEGOLAND", location: "日本樂高樂園", note: "全天行程。" },
                 { date: "2026-05-26", time: "10:30", driveTime: "35min", title: "吉卜力公園", location: "吉卜力公園", note: "需預約大倉庫門票。" },
                 { date: "2026-05-27", time: "10:00", driveTime: "15min", title: "東山動植物園", location: "東山動植物園", note: "看大猩猩夏巴尼。" },
                 { date: "2026-05-28", time: "10:00", driveTime: "45min", title: "麵包超人博物館", location: "名古屋麵包超人兒童博物館", note: "親子必去。" },
-                { date: "2026-05-29", time: "11:00", driveTime: "", title: "最後採買 & 退房", location: "AEON Mall Nagoya", note: "" },
-                { date: "2026-05-29", time: "16:35", driveTime: "", title: "回程航班", location: "中部國際機場(NGO)", note: "星宇航空 JX831。" }
+                { date: "2026-05-29", time: "11:00", driveTime: "", title: "最後採買", location: "AEON Mall", note: "" }
             ],
             checkBring: [{text:"護照", done:false}, {text:"國際駕照", done:false}], checkBuy: [], expenses: [], payers: ["薇那", "大人B", "大人C"], rate: 0.21
         };
@@ -206,6 +180,10 @@
 
         function renderAll() {
             const todayStr = "2026-04-08";
+            const tDate = new Date(todayStr);
+            tDate.setDate(tDate.getDate() + 1);
+            const tomorrowStr = tDate.toISOString().split('T')[0];
+
             const f = db.flightMain || masterData.flightMain;
             document.getElementById('f-airline').innerText = f.airline;
             document.getElementById('f-dep-date').innerText = (f.depDate||"").replace('2026-', '');
@@ -217,75 +195,87 @@
 
             db.itinerary.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
             const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
+            
             db.itinerary.forEach((it, idx) => {
                 const isPast = it.date < todayStr ? "is-past" : "";
-                itList.innerHTML += `<div onclick="viewDetail(${idx})" class="glass-card p-4 bg-white/40 border-l-[8px] border-amber-400 ${isPast}">
+                let cardHtml = `<div onclick="viewDetail(${idx})" class="glass-card p-4 bg-white/40 border-l-[8px] border-amber-400 ${isPast}">
                     <span class="font-black text-gray-500 uppercase text-[16px]">${it.date.replace('2026-', '')} ${it.time}</span>
                     <h3 class="font-black text-gray-800 mt-1 text-[20px]">${it.title || '(未命名)'}</h3>
                     <p class="text-blue-600 font-bold mt-1 text-[16px]">${it.location || ''}</p></div>`;
+
+                itList.innerHTML += cardHtml;
+
+                const nextIt = db.itinerary[idx + 1];
+                if (it.date === todayStr && nextIt && nextIt.date === tomorrowStr) {
+                    itList.innerHTML += `<div class="day-divider"><div class="silver-line"></div><span class="divider-text">Tomorrow</span><div class="silver-line"></div></div>`;
+                }
+
                 if (it.driveTime && idx < db.itinerary.length - 1) {
                     itList.innerHTML += `<div class="drive-container ${isPast}"><div class="drive-tag"><i class="fa-solid fa-car"></i> ${it.driveTime}</div></div>`;
                 }
             });
 
-            renderCheckList('bring', db.checkBring, 'bringList'); renderCheckList('buy', db.checkBuy, 'buyList');
+            renderCheckList('bring', db.checkBring, 'bringList'); 
+            renderCheckList('buy', db.checkBuy, 'buyList');
+
             const rate = db.rate || 0.21; let total = 0; const ps = {}; (db.payers||[]).forEach(p => ps[p] = 0);
-            document.getElementById('expList').innerHTML = (db.expenses||[]).slice().reverse().map((e, i) => { total += e.cost; ps[e.payer] += e.cost; return `<div class="glass-card p-4 flex justify-between items-center text-gray-800"><div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span></div>`; }).join('');
-            document.getElementById('totalSpend').innerText = total.toLocaleString(); document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
-// 修改為與大卡片相同的 Dark Glass 風格
-document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `
-    <div class="glass-card bg-gray-900/80 text-white p-4 rounded-2xl text-center border-none shadow-none">
-        <p class="opacity-50 text-[12px] uppercase font-bold">${p}</p>
-        <p class="font-black text-[16px] text-amber-400">¥${v.toLocaleString()}</p>
-    </div>`).join('');
+            document.getElementById('expList').innerHTML = (db.expenses||[]).slice().reverse().map((e, i) => { 
+                total += e.cost; ps[e.payer] += e.cost; 
+                return `<div class="glass-card p-4 flex justify-between items-center text-gray-800"><div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span></div>`; 
+            }).join('');
+            
+            document.getElementById('totalSpend').innerText = total.toLocaleString(); 
+            document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
+
+            document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `
+                <div class="glass-card bg-gray-900/80 text-white p-4 rounded-2xl text-center border-none shadow-none">
+                    <p class="opacity-50 text-[12px] uppercase font-bold">${p}</p>
+                    <p class="font-black text-[16px] text-amber-400">¥${v.toLocaleString()}</p>
+                </div>`).join('');
+            
             document.getElementById('expPayer').innerHTML = (db.payers||[]).map(p => `<option value="${p}">${p}</option>`).join('');
             document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `<div class="bg-white/10 px-4 py-1 rounded-full text-base text-white">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
         }
 
-function renderCheckList(t, list, cid) { 
+        function renderCheckList(t, list, cid) { 
             const container = document.getElementById(cid);
             if (!container) return;
-            
             container.innerHTML = list.map((item, idx) => `
                 <div class="list-row">
                     <div class="flex items-center gap-4 flex-grow overflow-hidden" onclick="toggleCheck('${t}',${idx})">
                         <i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-white/20'} text-2xl flex-shrink-0"></i>
                         <span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[19px] text-white">${item.text}</span>
                     </div>
-                    <button onclick="delItem('${t}',${idx})" class="text-white/20 hover:text-red-400 p-2 ml-2 flex-shrink-0">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button onclick="delItem('${t}',${idx})" class="text-white/20 hover:text-red-400 p-2 ml-2 flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
                 </div>`).join(''); 
         }
 
-function getWeatherIcon(code) {
-    if (code === 0) return 'fa-sun text-amber-400'; // 晴天
-    if (code >= 1 && code <= 3) return 'fa-cloud-sun text-gray-300'; // 多雲
-    if (code >= 45 && code <= 48) return 'fa-smog text-gray-400'; // 霧
-    if (code >= 51 && code <= 67) return 'fa-cloud-showers-heavy text-blue-400'; // 陣雨/毛毛雨
-    if (code >= 71 && code <= 77) return 'fa-snowflake text-blue-200'; // 雪
-    if (code >= 80 && code <= 82) return 'fa-cloud-rain text-blue-500'; // 大雨
-    if (code >= 95) return 'fa-cloud-bolt text-yellow-300'; // 雷雨
-    return 'fa-cloud text-gray-300'; // 預設雲朵
-}
+        function getWeatherIcon(code) {
+            if (code === 0) return 'fa-sun text-amber-400';
+            if (code >= 1 && code <= 3) return 'fa-cloud-sun text-gray-300';
+            if (code >= 45 && code <= 48) return 'fa-smog text-gray-400';
+            if (code >= 51 && code <= 67) return 'fa-cloud-showers-heavy text-blue-400';
+            if (code >= 71 && code <= 77) return 'fa-snowflake text-blue-200';
+            if (code >= 80 && code <= 82) return 'fa-cloud-rain text-blue-500';
+            if (code >= 95) return 'fa-cloud-bolt text-yellow-300';
+            return 'fa-cloud text-gray-300';
+        }
 
-        async function updateWeather() { try { const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1"); const data = await res.json(); const now = new Date().getHours(); let html = '';
+        async function updateWeather() { 
+            try { 
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.18&longitude=136.90&hourly=temperature_2m,weathercode&forecast_days=1"); 
+                const data = await res.json(); 
+                const now = new Date().getHours(); 
+                let html = '';
+                for(let i=0; i<6; i++) {
+                    const tIdx = (now + i) % 24;
+                    const wCode = data.hourly.weathercode[tIdx];
+                    html += `<div class="weather-item"><p class="text-white font-bold text-[11px] mb-1">${tIdx}:00</p><i class="fa-solid ${getWeatherIcon(wCode)} text-xl my-1"></i><p class="font-black text-white">${Math.round(data.hourly.temperature_2m[tIdx])}°</p></div>`;
+                } 
+                document.getElementById('weatherContainer').innerHTML = html; 
+            } catch(e){ console.error(e); }
+        }
 
-for(let i=0; i<6; i++) {
-            const tIdx = (now + i) % 24;
-            // 讀取天氣代碼並轉換成對應圖示
-            const wCode = data.hourly.weathercode[tIdx];
-            const iconClass = getWeatherIcon(wCode);
-            
-            html += `<div class="weather-item">
-                <p class="text-white font-bold text-[11px] mb-1">${tIdx}:00</p>
-                <i class="fa-solid ${iconClass} text-xl my-1"></i>
-                <p class="font-black text-white">${Math.round(data.hourly.temperature_2m[tIdx])}°</p>
-            </div>`;
-} document.getElementById('weatherContainer').innerHTML = html; } catch(e){
-console.error("天氣更新失敗", e);
-}
-}
         function viewDetail(idx) { const it = db.itinerary[idx]; document.getElementById('viewContent').innerHTML = `<p class="opacity-40 font-black uppercase">${it.date.replace('2026-', '')} ${it.time}</p><h2 class="text-2xl font-black mb-2">${it.title}</h2><p class="text-blue-600 font-bold mb-6">${it.location}</p><div class="bg-stone-50 p-6 rounded-3xl text-lg">${(it.note || '').replace(/\n/g, '<br>')}</div>`; document.getElementById('viewMapBtn').onclick = () => window.open("http://maps.google.com/?q=" + encodeURIComponent(it.location)); document.getElementById('viewEditBtn').onclick = () => { closeModal('viewModal'); openEditItinerary(idx); }; document.getElementById('viewDelBtn').onclick = () => { db.itinerary.splice(idx,1); pushData(); closeModal('viewModal'); }; openModal('viewModal'); }
         function openEditItinerary(idx) { const it = db.itinerary[idx]; document.getElementById('itIdx').value = idx; document.getElementById('itDate').value = it.date; document.getElementById('itTime').value = it.time; document.getElementById('itDrive').value = it.driveTime; document.getElementById('itHeading').value = it.title; document.getElementById('itLoc').value = it.location; document.getElementById('itNote').value = it.note; openModal('itineraryModal'); }
         function openAddItinerary() { document.querySelectorAll('#itineraryModal input, #itineraryModal textarea').forEach(i => i.value = ''); document.getElementById('itIdx').value = "-1"; openModal('itineraryModal'); }
