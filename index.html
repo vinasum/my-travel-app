@@ -50,7 +50,15 @@
         .weather-item { flex: 0 0 calc(33.33% - 7px); text-align: center; background: rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999; }
         
-        .list-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; flex-wrap: nowrap; }
+.list-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 6px 0; /* 從 12px 降到 6px，高度立刻少一半 */
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            width: 100%; 
+            flex-wrap: nowrap; 
+        }
         .title-glow { text-shadow: 0 0 15px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(10, 25, 47, 0.9); letter-spacing: 0.15em; }
 
         .day-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0 16px 0; padding: 0 10px; }
@@ -266,9 +274,9 @@ function renderAll() {
             container.innerHTML = list.map((item, idx) => `
                 <div class="list-row">
                     <div class="flex items-center gap-4 flex-grow overflow-hidden" onclick="toggleCheck('${t}',${idx})">
-                        <i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-white/20'} text-2xl flex-shrink-0"></i>
-                        <span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[19px] text-white">${item.text}</span>
-                    </div>
+
+<i class="fa-solid ${item.done ? 'fa-square-check text-amber-500' : 'fa-square text-white/20'} text-xl flex-shrink-0"></i> 
+<span class="${item.done ? 'opacity-30 line-through' : 'font-bold'} truncate text-[16px] text-white">${item.text}</span>                    </div>
                     <button onclick="delItem('${t}',${idx})" class="text-white/20 hover:text-red-400 p-2 ml-2 flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
                 </div>`).join(''); 
         }
