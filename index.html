@@ -178,12 +178,11 @@
             renderAll(); 
         }
 
-        function renderAll() {
-            const todayStr = "2026-04-08";
-            const tDate = new Date(todayStr);
-            tDate.setDate(tDate.getDate() + 1);
-            const tomorrowStr = tDate.toISOString().split('T')[0];
+function renderAll() {
+            // 1. 動態取得今天日期，確保手機端能正確顯示「過去行程」的灰階效果
+            const todayStr = new Date().toISOString().split('T')[0];
 
+            // 2. 渲染航班主體卡片
             const f = db.flightMain || masterData.flightMain;
             document.getElementById('f-airline').innerText = f.airline;
             document.getElementById('f-dep-date').innerText = (f.depDate||"").replace('2026-', '');
@@ -193,11 +192,15 @@
             document.getElementById('f-arr-from').innerText = f.arrFrom; document.getElementById('f-arr-to').innerText = f.arrTo;
             document.getElementById('f-arr-no').innerText = f.arrNo; document.getElementById('f-arr-time').innerText = f.arrTime; document.getElementById('f-arr-arr-time').innerText = f.arrArrTime;
 
+            // 3. 渲染行程清單 (自動偵測日期切換並劃線)
             db.itinerary.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
-            const itList = document.getElementById('itineraryList'); itList.innerHTML = '';
+            const itList = document.getElementById('itineraryList'); 
+            itList.innerHTML = '';
             
             db.itinerary.forEach((it, idx) => {
                 const isPast = it.date < todayStr ? "is-past" : "";
+                
+                // 產生行程卡片 HTML
                 let cardHtml = `<div onclick="viewDetail(${idx})" class="glass-card p-4 bg-white/40 border-l-[8px] border-amber-400 ${isPast}">
                     <span class="font-black text-gray-500 uppercase text-[16px]">${it.date.replace('2026-', '')} ${it.time}</span>
                     <h3 class="font-black text-gray-800 mt-1 text-[20px]">${it.title || '(未命名)'}</h3>
@@ -205,38 +208,58 @@
 
                 itList.innerHTML += cardHtml;
 
+                // 核心邏輯：只要當前行程與下一個行程日期不同，就自動劃線
                 const nextIt = db.itinerary[idx + 1];
-                if (it.date === todayStr && nextIt && nextIt.date === tomorrowStr) {
-                    itList.innerHTML += `<div class="day-divider"><div class="silver-line"></div><span class="divider-text">Tomorrow</span><div class="silver-line"></div></div>`;
+                if (nextIt && it.date !== nextIt.date) {
+                    itList.innerHTML += `
+                        <div class="day-divider">
+                            <div class="silver-line"></div>
+                            <span class="divider-text">Next Day</span>
+                            <div class="silver-line"></div>
+                        </div>`;
                 }
 
+                // 渲染車程
                 if (it.driveTime && idx < db.itinerary.length - 1) {
                     itList.innerHTML += `<div class="drive-container ${isPast}"><div class="drive-tag"><i class="fa-solid fa-car"></i> ${it.driveTime}</div></div>`;
                 }
             });
 
+            // 4. 渲染清單 (物品清單)
             renderCheckList('bring', db.checkBring, 'bringList'); 
             renderCheckList('buy', db.checkBuy, 'buyList');
 
-            const rate = db.rate || 0.21; let total = 0; const ps = {}; (db.payers||[]).forEach(p => ps[p] = 0);
+            // 5. 渲染記帳統計
+            const rate = db.rate || 0.21; 
+            let total = 0; 
+            const ps = {}; 
+            (db.payers||[]).forEach(p => ps[p] = 0);
+
             document.getElementById('expList').innerHTML = (db.expenses||[]).slice().reverse().map((e, i) => { 
                 total += e.cost; ps[e.payer] += e.cost; 
-                return `<div class="glass-card p-4 flex justify-between items-center text-gray-800"><div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div><span class="font-black text-xl">¥${e.cost.toLocaleString()}</span></div>`; 
+                return `<div class="glass-card p-4 flex justify-between items-center text-gray-800">
+                            <div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div>
+                            <span class="font-black text-xl">¥${e.cost.toLocaleString()}</span>
+                        </div>`; 
             }).join('');
             
             document.getElementById('totalSpend').innerText = total.toLocaleString(); 
             document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
 
+            // 6. 渲染成人統計小卡
             document.getElementById('payerStats').innerHTML = Object.entries(ps).map(([p, v]) => `
                 <div class="glass-card bg-gray-900/80 text-white p-4 rounded-2xl text-center border-none shadow-none">
                     <p class="opacity-50 text-[12px] uppercase font-bold">${p}</p>
                     <p class="font-black text-[16px] text-amber-400">¥${v.toLocaleString()}</p>
                 </div>`).join('');
             
+            // 7. 更新設定頁面元件
             document.getElementById('expPayer').innerHTML = (db.payers||[]).map(p => `<option value="${p}">${p}</option>`).join('');
-            document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `<div class="bg-white/10 px-4 py-1 rounded-full text-base text-white">${p} <button onclick="delPayerName(${i})">×</button></div>`).join('');
+            document.getElementById('payerManagerList').innerHTML = (db.payers||[]).map((p, i) => `
+                <div class="bg-white/10 px-4 py-1 rounded-full text-base text-white flex items-center gap-2">
+                    ${p} <button onclick="delPayerName(${i})">×</button>
+                </div>`).join('');
         }
-
         function renderCheckList(t, list, cid) { 
             const container = document.getElementById(cid);
             if (!container) return;
