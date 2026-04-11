@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<link rel="manifest" href="./manifest.json?v=2">
+<link rel="icon" type="image/png" href="./icon.png">
+<link rel="apple-touch-icon" href="./icon.png">
+ 
+    <meta name="theme-color" content="#1A2A3A">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nagoya Express v11.0</title>
@@ -390,6 +396,12 @@ async function pushData() {
         function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
+// 註冊 Service Worker 讓 Chrome 認可這是個 App
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(() => {
+                console.log('Service Worker 註冊成功');
+            });
+        }
         init();
     </script>
 </body>
