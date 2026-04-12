@@ -194,9 +194,12 @@ function updateOnlineStatus() {
     const offlineNotice = document.getElementById('offline-notice');
     const syncBtn = document.getElementById('syncBtn');
     
-    // 移除 setTimeout，改為直接判定，避免刷新時的閃爍消失
-    const isOffline = !navigator.onLine;
-
+    // 多這一步：等 150 毫秒再判定，避開瀏覽器開機時的混亂期
+    setTimeout(() => {
+        const isOffline = !navigator.onLine;
+        // ... 原本的控制邏輯 ...
+    }, 150); 
+}
     if (isOffline) {
         document.body.classList.add('is-offline');
         if (offlineNotice) {
