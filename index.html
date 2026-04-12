@@ -194,36 +194,35 @@ function updateOnlineStatus() {
     const offlineNotice = document.getElementById('offline-notice');
     const syncBtn = document.getElementById('syncBtn');
     
-    // 多這一步：等 150 毫秒再判定，避開瀏覽器開機時的混亂期
+    // 這是 setTimeout 的開頭
     setTimeout(() => {
         const isOffline = !navigator.onLine;
-        // ... 原本的控制邏輯 ...
-    }, 150); 
-}
-    if (isOffline) {
-        document.body.classList.add('is-offline');
-        if (offlineNotice) {
-            offlineNotice.classList.remove('hidden');
-            offlineNotice.style.setProperty('display', 'block', 'important');
+
+        if (isOffline) {
+            document.body.classList.add('is-offline');
+            if (offlineNotice) {
+                offlineNotice.classList.remove('hidden');
+                offlineNotice.style.setProperty('display', 'block', 'important');
+            }
+            if (syncBtn) {
+                syncBtn.style.opacity = "0.2";
+                syncBtn.style.pointerEvents = "none";
+            }
+            toggleInputs(true);
+        } else {
+            document.body.classList.remove('is-offline');
+            if (offlineNotice) {
+                offlineNotice.classList.add('hidden');
+                offlineNotice.style.display = 'none';
+            }
+            if (syncBtn) {
+                syncBtn.style.opacity = "1";
+                syncBtn.style.pointerEvents = "auto";
+            }
+            toggleInputs(false);
         }
-        if (syncBtn) {
-            syncBtn.style.opacity = "0.2";
-            syncBtn.style.pointerEvents = "none";
-        }
-        toggleInputs(true);
-    } else {
-        document.body.classList.remove('is-offline');
-        if (offlineNotice) {
-            offlineNotice.classList.add('hidden');
-            offlineNotice.style.display = 'none';
-        }
-        if (syncBtn) {
-            syncBtn.style.opacity = "1";
-            syncBtn.style.pointerEvents = "auto";
-        }
-        toggleInputs(false);
-    }
-}
+    }, 150); // 這裡結束 setTimeout，注意這行有 });
+} // 這是 function 的結尾，注意這行只有一個 }
 
 // 修改 pullData 函式 (約在 410 行)，加入斷網防呆
 // 鎖定/解鎖所有輸入元件的輔助函式
