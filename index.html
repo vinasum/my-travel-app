@@ -401,12 +401,17 @@ async function pushData() {
 }
 async function pullData(onFailCallback) {
     showSync(true);
+    
+    // 建立一個 3 秒強制中斷的控制器，防止 fetch 卡死
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
     try {
-        const res = await fetch(GOOGLE_SCRIPT_URL);
+        const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
         const cloudData = await res.json();
+        clearTimeout(timeoutId); // 成功則清除計時器
         
         if(cloudData) {
-            // ... 同步邏輯 (v11.9 原有代碼) ...
             const localBring = db.checkBring;
             const localBuy = db.checkBuy;
             db = Object.assign({}, masterData, cloudData);
@@ -415,11 +420,13 @@ async function pullData(onFailCallback) {
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             renderAll();
             
-            document.body.classList.remove('is-offline'); // 成功則確保解除鎖定
+            // 同步成功：確保解除鎖定
+            document.body.classList.remove('is-offline');
             toast("🏮 同步成功 (清單維持本地)");
         }
     } catch (e) {
-        // 如果 fetch 失敗，代表真的斷網了，執行刷新後的 UI 鎖定
+        // 只要 fetch 失敗或是 3 秒到了（超時），立刻觸發刷新後的離線提示
+        console.warn("連線實測失敗，啟動離線防禦");
         if (onFailCallback) onFailCallback();
     }
     showSync(false);
