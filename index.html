@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<link rel="manifest" href="./manifest.json?v=3">
+<link rel="manifest" href="./manifest.json?v=2">
 <link rel="icon" type="image/png" href="./icon.png">
 <link rel="apple-touch-icon" href="./icon.png">
  
@@ -14,18 +14,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-/* 離線狀態下的按鈕旋轉動畫 (同步時可用) */
-        .spinning {
-            animation: fa-spin 1s infinite linear;
+        /* 離線鎖定樣式 */
+        body.is-offline input, 
+        body.is-offline select, 
+        body.is-offline button.muji-btn,
+        body.is-offline button[onclick*="add"] {
+        filter: grayscale(1);
+        pointer-events: none !important;
+        opacity: 0.6;
         }
-
-        /* 離線模式下，強制禁止點擊所有增加資料的按鈕 */
-        body.is-offline button[onclick*="addItem"],
-        body.is-offline button[onclick*="addExp"] {
-            filter: grayscale(1);
-            pointer-events: none !important;
-        }
-
         :root { --n-gold: #E6B422; --n-wago: #1A2A3A; }
         
         body { 
@@ -96,24 +93,17 @@
         }
     </style>
 </head>
-<body class="max-w-md mx-auto relative min-h-screen">
+<body class="max-w-md mx-auto relative px-5">
     <div id="offline-notice" class="hidden bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
         <i class="fa-solid fa-wifi-slash mr-2"></i>目前無網路，資料為前次紀錄。
-    </div>
-
-    <div class="px-5">
-        <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
-        
-        <header class="pt-10 pb-6 flex justify-between items-center relative">
+    </div>    <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
+    
+    <header class="pt-10 pb-6 flex justify-between items-center">
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-black text-white title-glow">名古屋旅程</h1>
             <i class="fa-solid fa-fish-fins text-amber-400 text-2xl rotate-45"></i>
         </div>
-        
-        <button id="syncBtn" onclick="pullData()" class="text-white/30 text-2xl p-2 transition-all duration-300 hover:text-white">
-            <i class="fa-solid fa-arrows-rotate"></i>
-        </button>
-
+        <button onclick="pullData()" class="text-white/30 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
     </header>
 
     <main>
@@ -171,7 +161,6 @@
             <button onclick="resetToDefault()" class="w-full py-4 mt-10 text-red-400/30 font-bold border border-red-400/10 rounded-2xl">🆘 恢復備份 (重整數據)</button>
         </div>
     </main>
-</div>
 
     <nav class="fixed bottom-0 left-0 right-0 flex justify-around py-3 pb-8">
         <button onclick="switchPage('itinerary')" id="nav-itinerary" class="text-white/40 flex flex-col items-center nav-active"><i class="fa-solid fa-map-location-dot text-xl"></i><span class="text-[14px] mt-1">行程</span></button>
@@ -188,59 +177,6 @@
     <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full opacity-0 transition-all z-[9999] pointer-events-none"></div>
 
     <script>
-// --- 離線偵測系統 ---
-// --- 強化版離線偵測 ---
-function updateOnlineStatus() {
-    const offlineNotice = document.getElementById('offline-notice');
-    const syncBtn = document.getElementById('syncBtn');
-    
-    // 這是 setTimeout 的開頭
-    setTimeout(() => {
-        const isOffline = !navigator.onLine;
-
-        if (isOffline) {
-            document.body.classList.add('is-offline');
-            if (offlineNotice) {
-                offlineNotice.classList.remove('hidden');
-                offlineNotice.style.setProperty('display', 'block', 'important');
-            }
-            if (syncBtn) {
-                syncBtn.style.opacity = "0.2";
-                syncBtn.style.pointerEvents = "none";
-            }
-            toggleInputs(true);
-        } else {
-            document.body.classList.remove('is-offline');
-            if (offlineNotice) {
-                offlineNotice.classList.add('hidden');
-                offlineNotice.style.display = 'none';
-            }
-            if (syncBtn) {
-                syncBtn.style.opacity = "1";
-                syncBtn.style.pointerEvents = "auto";
-            }
-            toggleInputs(false);
-        }
-    }, 150); // 這裡結束 setTimeout，注意這行有 });
-} // 這是 function 的結尾，注意這行只有一個 }
-
-// 修改 pullData 函式 (約在 410 行)，加入斷網防呆
-// 鎖定/解鎖所有輸入元件的輔助函式
-function toggleInputs(disabled) {
-    const elements = document.querySelectorAll('input, select, textarea, button[onclick*="addItem"], button[onclick*="addExp"]');
-    elements.forEach(el => {
-        el.disabled = disabled;
-        el.style.opacity = disabled ? "0.5" : "1";
-        if(disabled) el.style.cursor = "not-allowed";
-        else el.style.cursor = "auto";
-    });
-}
-
-// 監聽網路切換事件
-window.addEventListener('online', updateOnlineStatus);
-window.addEventListener('offline', updateOnlineStatus);
-
-
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
         // 重要：固定此 KEY，以後更新程式碼都不會清除手機資料
         const DB_KEY = 'vina_travel_production_v1';
@@ -272,32 +208,24 @@ window.addEventListener('offline', updateOnlineStatus);
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-// --- 整合後的啟動邏輯 ---
-function init() {
-    // 1. 第一時間檢查網路與 DOM 狀態
-    updateOnlineStatus(); 
-
-    // 2. 偵測唯讀模式
+function init() { 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'view') {
         document.body.classList.add('mode-view');
         toast("👓 進入唯讀觀賞模式");
     }
 
-    // 3. 讀取資料
     const local = localStorage.getItem(DB_KEY); 
-    if (local) { 
-        db = Object.assign({}, masterData, JSON.parse(local)); 
-    }
+    if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
     
-    // 4. 設定匯率並渲染
-    if (document.getElementById('exRate')) {
-        document.getElementById('exRate').value = db.rate || 0.21;
-    }
+    document.getElementById('exRate').value = db.rate || 0.21;
     renderAll(); 
 
-    // 5. 如果在線，自動拉取雲端
-    if (navigator.onLine) {
+    // 核心偵測：若斷網刷新，立刻掛紅條
+    if (!navigator.onLine) {
+        document.getElementById('offline-notice').classList.remove('hidden');
+        document.body.classList.add('is-offline');
+    } else {
         pullData();
     }
 }
@@ -462,7 +390,6 @@ async function pullData() {
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const cloudData = await res.json();
-        
         if (cloudData) {
             const localBring = db.checkBring;
             const localBuy = db.checkBuy;
@@ -471,28 +398,28 @@ async function pullData() {
             db.checkBuy = localBuy;
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             renderAll();
-            updateOnlineStatus(); 
-            toast("🏮 同步成功 (清單維持本地)");
+            
+            // 同步成功：隱藏警告
+            document.getElementById('offline-notice').classList.add('hidden');
+            document.body.classList.remove('is-offline');
+            toast("🏮 同步成功");
         }
     } catch (e) {
-        console.log("連線失敗，啟動離線防護");
-        updateOnlineStatus(); 
+        // 同步失敗（斷網）：釘上警告
+        document.getElementById('offline-notice').classList.remove('hidden');
+        document.body.classList.add('is-offline');
     }
     showSync(false);
 }        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
-// --- 最終啟動程序 ---
-        // 1. 註冊 PWA 功能（只需寫一次）
+// 註冊 Service Worker 讓 Chrome 認可這是個 App
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(() => {
-                console.log('Nagoya Express PWA Ready');
+                console.log('Service Worker 註冊成功');
             });
         }
-
-        // 2. 確保 HTML 結構載入後才啟動 App 邏輯
-        document.addEventListener('DOMContentLoaded', () => {
-            init(); 
-        });
+        init();
     </script>
-</body></html>
+</body>
+</html>
