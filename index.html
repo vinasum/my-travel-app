@@ -215,19 +215,19 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
 function init() { 
-    // 定義設定離線狀態的專用方法
+    // 定義設定「刷新後」離線狀態的方法
     const setOfflineUI = () => {
         const msgEl = document.getElementById('offline-msg');
         if (msgEl) msgEl.innerText = "🏮 離線模式：目前正在瀏覽快取版本";
         document.body.classList.add('is-offline');
     };
 
-    // 啟動即偵測 (Static Check)
+    // 第一層偵測：硬體狀態 (快，但不精準)
     if (!navigator.onLine) {
         setOfflineUI();
     }
 
-    // ... 處理模式與讀取快取 (v11.9 原有邏輯) ...
+    // ... (模式與快取讀取邏輯維持不變) ...
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'view') {
         document.body.classList.add('mode-view');
@@ -238,12 +238,11 @@ function init() {
     document.getElementById('exRate').value = db.rate || 0.21;
     renderAll(); 
 
-    // 只有判定在線才同步，若失敗則補強偵測
-    if (navigator.onLine) {
-        pullData(setOfflineUI); // 傳入 UI 設定方法
+    // 第二層偵測：實測同步 (慢 3 秒，但百分之百精準)
+    // 即使 navigator.onLine 回傳 true，也要傳入 setOfflineUI 作為失敗保險
+    pullData(setOfflineUI); 
     }
-}
-function renderAll() {
+    function renderAll() {
             // 1. 動態取得今天日期，確保手機端能正確顯示「過去行程」的灰階效果
             const todayStr = new Date().toISOString().split('T')[0];
 
@@ -402,9 +401,9 @@ async function pushData() {
 async function pullData(onFailCallback) {
     showSync(true);
     
-    // 建立一個 3 秒強制中斷的控制器，防止 fetch 卡死
+    // 建立一個 5 秒強制中斷的控制器，防止 fetch 卡死
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
@@ -425,14 +424,14 @@ async function pullData(onFailCallback) {
             toast("🏮 同步成功 (清單維持本地)");
         }
     } catch (e) {
-        // 只要 fetch 失敗或是 3 秒到了（超時），立刻觸發刷新後的離線提示
+        // 只要 fetch 失敗或是 5 秒到了（超時），立刻觸發刷新後的離線提示
         console.warn("連線實測失敗，啟動離線防禦");
         if (onFailCallback) onFailCallback();
     }
     showSync(false);
 }
         function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
-        function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
+        function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 5000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
 // 註冊 Service Worker 讓 Chrome 認可這是個 App
         if ('serviceWorker' in navigator) {
