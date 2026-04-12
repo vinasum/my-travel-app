@@ -14,6 +14,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+/* 離線狀態下的按鈕旋轉動畫 (同步時可用) */
+        .spinning {
+            animation: fa-spin 1s infinite linear;
+        }
+
+        /* 離線模式下，強制禁止點擊所有增加資料的按鈕 */
+        body.is-offline button[onclick*="addItem"],
+        body.is-offline button[onclick*="addExp"] {
+            filter: grayscale(1);
+            pointer-events: none !important;
+        }
+
         :root { --n-gold: #E6B422; --n-wago: #1A2A3A; }
         
         body { 
@@ -87,12 +99,19 @@
 <body class="max-w-md mx-auto relative px-5">
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
-    <header class="pt-10 pb-6 flex justify-between items-center">
+<header class="pt-10 pb-6 flex justify-between items-center relative">
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-black text-white title-glow">名古屋旅程</h1>
             <i class="fa-solid fa-fish-fins text-amber-400 text-2xl rotate-45"></i>
         </div>
-        <button onclick="pullData()" class="text-white/30 text-2xl p-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+        
+        <button id="syncBtn" onclick="pullData()" class="text-white/30 text-2xl p-2 transition-all duration-300 hover:text-white">
+            <i class="fa-solid fa-arrows-rotate"></i>
+        </button>
+
+        <div id="offline-notice" class="absolute -bottom-2 left-0 w-full text-center text-[10px] text-red-400/80 font-bold tracking-widest hidden">
+            <i class="fa-solid fa-wifi-slash mr-1"></i>目前無網路，資料為上次紀錄
+        </div>
     </header>
 
     <main>
@@ -166,6 +185,71 @@
     <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full opacity-0 transition-all z-[9999] pointer-events-none"></div>
 
     <script>
+// --- 離線偵測系統 ---
+function updateOnlineStatus() {
+    const syncBtn = document.getElementById('syncBtn');
+    const offlineNotice = document.getElementById('offline-notice');
+    
+    if (!navigator.onLine) {
+        // 1. 進入離線模式：顯示提示、按鈕變灰
+        document.body.classList.add('is-offline');
+        if (offlineNotice) offlineNotice.classList.remove('hidden');
+        if (syncBtn) {
+            syncBtn.style.opacity = "0.1";
+            syncBtn.style.pointerEvents = "none";
+        }
+        
+        // 2. 顯示一次性的提示通知
+        if (typeof toast === 'function') toast("🚫 目前無網路，已開啟唯讀模式");
+        
+        // 3. 鎖定所有輸入框與存檔按鈕
+        toggleInputs(true);
+    } else {
+        // 1. 回到在線模式：隱藏提示、恢復按鈕
+        document.body.classList.remove('is-offline');
+        if (offlineNotice) offlineNotice.classList.add('hidden');
+        if (syncBtn) {
+            syncBtn.style.opacity = "1";
+            syncBtn.style.pointerEvents = "auto";
+        }
+        
+        // 2. 解除鎖定
+        toggleInputs(false);
+    }
+}
+
+// 鎖定/解鎖所有輸入元件的輔助函式
+function toggleInputs(disabled) {
+    const elements = document.querySelectorAll('input, select, textarea, button[onclick*="addItem"], button[onclick*="addExp"]');
+    elements.forEach(el => {
+        el.disabled = disabled;
+        el.style.opacity = disabled ? "0.5" : "1";
+        if(disabled) el.style.cursor = "not-allowed";
+        else el.style.cursor = "auto";
+    });
+}
+
+// 監聽網路切換事件
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+// 修改妳原本的 init()，加入啟動偵測
+function init() {
+    updateOnlineStatus(); // 確保一開 App 就檢查網路
+    
+    // ... 妳原本讀取 localStorage 和 renderAll 的邏輯 ...
+    const local = localStorage.getItem(DB_KEY);
+    if (local) {
+        db = JSON.parse(local);
+        renderAll();
+    }
+    
+    // 如果有網路，才執行自動下載
+    if (navigator.onLine) {
+        pullData();
+    }
+}
+
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyygnjaryM3s4Zf9XSnVStWNhBpwUoFrdJp1jX2-IFmYzglxlfdd_enycNmW5Y_92ejfg/exec';
         // 重要：固定此 KEY，以後更新程式碼都不會清除手機資料
         const DB_KEY = 'vina_travel_production_v1';
