@@ -97,10 +97,9 @@
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
-        <div id="offline-notice" class="absolute -bottom-2 left-0 w-full text-center text-[10px] text-red-400/80 font-bold tracking-widest hidden">
-            <i class="fa-solid fa-wifi-slash mr-1"></i>目前無網路，資料為前次紀錄。
-        </div>
-
+    <div id="offline-notice" class="hidden bg-red-600 text-white text-center py-1.5 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-md">
+        <i class="fa-solid fa-wifi-slash mr-2"></i>目前無網路，資料為前次紀錄。
+    </div>
 
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
