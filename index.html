@@ -223,17 +223,6 @@ function updateOnlineStatus() {
 }
 
 // 修改 pullData 函式 (約在 410 行)，加入斷網防呆
-async function pullData() {
-    showSync(true);
-    try {
-        const res = await fetch(GOOGLE_SCRIPT_URL);
-        // ... 原本的邏輯 ...
-    } catch (e) {
-        console.log("連線失敗，檢查網路狀態");
-        updateOnlineStatus(); // 如果 fetch 失敗，強制跑一次檢查
-    }
-    showSync(false);
-}
 // 鎖定/解鎖所有輸入元件的輔助函式
 function toggleInputs(disabled) {
     const elements = document.querySelectorAll('input, select, textarea, button[onclick*="addItem"], button[onclick*="addExp"]');
@@ -466,32 +455,27 @@ async function pushData() {
     } catch(e) { console.error(e); }
     showSync(false);
 }
-        async function pullData() {
+async function pullData() {
     showSync(true);
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const cloudData = await res.json();
         
         if(cloudData) {
-            // 先備份本地的清單
-            const localBring = db.checkBring;
-            const localBuy = db.checkBuy;
-
-            // 讀取雲端資料
-            db = Object.assign({}, masterData, cloudData);
-
-            // 把本地備份的清單填回去，防止被雲端覆蓋
-            db.checkBring = localBring;
-            db.checkBuy = localBuy;
-
+            // ... 妳原本的備份清單與 Object.assign 邏輯 ...
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             renderAll();
+            // 成功連線，確保紅條消失
+            updateOnlineStatus(); 
             toast("🏮 同步成功 (清單維持本地)");
         }
-    } catch (e) {}
+    } catch (e) {
+        // 核心修正：連線失敗（斷網）時，立刻強制執行紅條顯示
+        console.log("連線失敗，啟動離線防護");
+        updateOnlineStatus(); 
+    }
     showSync(false);
-}
-        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
+}        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
 // --- 最終啟動程序 ---
