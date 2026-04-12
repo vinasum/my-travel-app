@@ -463,16 +463,18 @@ async function pullData() {
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const cloudData = await res.json();
         
-        if(cloudData) {
-            // ... 妳原本的備份清單與 Object.assign 邏輯 ...
+        if (cloudData) {
+            const localBring = db.checkBring;
+            const localBuy = db.checkBuy;
+            db = Object.assign({}, masterData, cloudData);
+            db.checkBring = localBring;
+            db.checkBuy = localBuy;
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             renderAll();
-            // 成功連線，確保紅條消失
             updateOnlineStatus(); 
             toast("🏮 同步成功 (清單維持本地)");
         }
     } catch (e) {
-        // 核心修正：連線失敗（斷網）時，立刻強制執行紅條顯示
         console.log("連線失敗，啟動離線防護");
         updateOnlineStatus(); 
     }
