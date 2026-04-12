@@ -95,18 +95,6 @@
         .mode-view #viewDelBtn {
             display: none !important;
         }
-    // --- 監聽模式：處理刷新前的即時斷網事件 ---
-    window.addEventListener('offline', () => {
-        // 1. 設定刷新前的提示文字
-        document.getElementById('offline-msg').innerText = "⚠️ 網路連線已中斷，目前操作將無法同步";
-        // 2. 貼上標籤觸發 CSS 鎖定
-        document.body.classList.add('is-offline');
-    });
-
-    window.addEventListener('online', () => {
-        // 恢復連線時自動解鎖
-        document.body.classList.remove('is-offline');
-    });
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
@@ -431,7 +419,21 @@ async function pushData() {
                 console.log('Service Worker 註冊成功');
             });
         }
+        
         init();
+            // --- 監聽模式：處理刷新前的即時斷網事件 ---
+    window.addEventListener('offline', () => {
+        // 1. 設定刷新前的提示文字
+        document.getElementById('offline-msg').innerText = "⚠️ 網路連線已中斷，目前操作將無法同步";
+        // 2. 貼上標籤觸發 CSS 鎖定
+        document.body.classList.add('is-offline');
+    });
+
+    window.addEventListener('online', () => {
+        // 恢復連線時自動解鎖
+        document.body.classList.remove('is-offline');
+    });
+
     </script>
 </body>
 </html>
