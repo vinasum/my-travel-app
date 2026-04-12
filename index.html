@@ -214,21 +214,36 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function init() { 
-// 偵測網址是否有 ?mode=view
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('mode') === 'view') {
-                document.body.classList.add('mode-view');
-                toast("👓 進入唯讀觀賞模式");
-            }
+function init() { 
+    // --- 第二步：啟動即偵測 (Static Check) ---
+    // 這不是監聽，是網頁一開啟就「查戶口」
+    if (!navigator.onLine) {
+        // 1. 設定刷新後的專用提示文字（與監聽器的文字做出區隔）
+        const msgEl = document.getElementById('offline-msg');
+        if (msgEl) msgEl.innerText = "🏮 離線模式：目前正在瀏覽快取版本";
+        // 2. 貼上標籤觸發 CSS 物理鎖定
+        document.body.classList.add('is-offline');
+    }
 
-            // ... 後續原本的代碼 ...
-            const local = localStorage.getItem(DB_KEY); 
-            if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
-            document.getElementById('exRate').value = db.rate || 0.21;
-            renderAll(); 
-        }
+    // 處理唯讀模式參數
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'view') {
+        document.body.classList.add('mode-view');
+        toast("👓 進入唯讀觀賞模式");
+    }
 
+    // 讀取本地快取
+    const local = localStorage.getItem(DB_KEY); 
+    if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
+    
+    document.getElementById('exRate').value = db.rate || 0.21;
+    renderAll(); 
+
+    // 只有判定在線，才執行雲端同步
+    if (navigator.onLine) {
+        pullData();
+    }
+}
 function renderAll() {
             // 1. 動態取得今天日期，確保手機端能正確顯示「過去行程」的灰階效果
             const todayStr = new Date().toISOString().split('T')[0];
