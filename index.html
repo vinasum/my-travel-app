@@ -96,14 +96,15 @@
         }
     </style>
 </head>
-<body class="max-w-md mx-auto relative px-5">
-    <div id="offline-notice" class="hidden bg-red-600 text-white text-center py-1.5 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-md">
+<body class="max-w-md mx-auto relative min-h-screen">
+    <div id="offline-notice" class="hidden bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
         <i class="fa-solid fa-wifi-slash mr-2"></i>目前無網路，資料為前次紀錄。
     </div>
 
-    <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
-    
-<header class="pt-10 pb-6 flex justify-between items-center relative">
+    <div class="px-5">
+        <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
+        
+        <header class="pt-10 pb-6 flex justify-between items-center relative">
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-black text-white title-glow">名古屋旅程</h1>
             <i class="fa-solid fa-fish-fins text-amber-400 text-2xl rotate-45"></i>
@@ -170,6 +171,7 @@
             <button onclick="resetToDefault()" class="w-full py-4 mt-10 text-red-400/30 font-bold border border-red-400/10 rounded-2xl">🆘 恢復備份 (重整數據)</button>
         </div>
     </main>
+</div>
 
     <nav class="fixed bottom-0 left-0 right-0 flex justify-around py-3 pb-8">
         <button onclick="switchPage('itinerary')" id="nav-itinerary" class="text-white/40 flex flex-col items-center nav-active"><i class="fa-solid fa-map-location-dot text-xl"></i><span class="text-[14px] mt-1">行程</span></button>
@@ -187,41 +189,51 @@
 
     <script>
 // --- 離線偵測系統 ---
+// --- 強化版離線偵測 ---
 function updateOnlineStatus() {
     const offlineNotice = document.getElementById('offline-notice');
     const syncBtn = document.getElementById('syncBtn');
     
-    // 增加 100ms 延遲，確保 PWA 載入時 DOM 已經穩定
-    setTimeout(() => {
-        const isOffline = !navigator.onLine;
+    // 移除 setTimeout，改為直接判定，避免刷新時的閃爍消失
+    const isOffline = !navigator.onLine;
 
-        if (isOffline) {
-            document.body.classList.add('is-offline');
-            if (offlineNotice) {
-                offlineNotice.classList.remove('hidden');
-                // 強制顯示並保持在最上方
-                offlineNotice.style.setProperty('display', 'block', 'important');
-            }
-            if (syncBtn) {
-                syncBtn.style.opacity = "0.1";
-                syncBtn.style.pointerEvents = "none";
-            }
-            toggleInputs(true);
-        } else {
-            document.body.classList.remove('is-offline');
-            if (offlineNotice) {
-                offlineNotice.classList.add('hidden');
-                offlineNotice.style.display = 'none';
-            }
-            if (syncBtn) {
-                syncBtn.style.opacity = "1";
-                syncBtn.style.pointerEvents = "auto";
-            }
-            toggleInputs(false);
+    if (isOffline) {
+        document.body.classList.add('is-offline');
+        if (offlineNotice) {
+            offlineNotice.classList.remove('hidden');
+            offlineNotice.style.setProperty('display', 'block', 'important');
         }
-    }, 100);
+        if (syncBtn) {
+            syncBtn.style.opacity = "0.2";
+            syncBtn.style.pointerEvents = "none";
+        }
+        toggleInputs(true);
+    } else {
+        document.body.classList.remove('is-offline');
+        if (offlineNotice) {
+            offlineNotice.classList.add('hidden');
+            offlineNotice.style.display = 'none';
+        }
+        if (syncBtn) {
+            syncBtn.style.opacity = "1";
+            syncBtn.style.pointerEvents = "auto";
+        }
+        toggleInputs(false);
+    }
 }
 
+// 修改 pullData 函式 (約在 410 行)，加入斷網防呆
+async function pullData() {
+    showSync(true);
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL);
+        // ... 原本的邏輯 ...
+    } catch (e) {
+        console.log("連線失敗，檢查網路狀態");
+        updateOnlineStatus(); // 如果 fetch 失敗，強制跑一次檢查
+    }
+    showSync(false);
+}
 // 鎖定/解鎖所有輸入元件的輔助函式
 function toggleInputs(disabled) {
     const elements = document.querySelectorAll('input, select, textarea, button[onclick*="addItem"], button[onclick*="addExp"]');
@@ -482,22 +494,17 @@ async function pushData() {
         function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
-// 註冊 Service Worker 讓 Chrome 認可這是個 App
+// --- 最終啟動程序 ---
+        // 1. 註冊 PWA 功能（只需寫一次）
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(() => {
-                console.log('Service Worker 註冊成功');
-            });
-        }
-// 註冊 Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(() => {
-                console.log('Service Worker 註冊成功');
+                console.log('Nagoya Express PWA Ready');
             });
         }
 
-        // --- 這裡就是 DOMContentLoaded！放在檔案最後面 ---
+        // 2. 確保 HTML 結構載入後才啟動 App 邏輯
         document.addEventListener('DOMContentLoaded', () => {
-            init(); // 確保整張網頁都排版好了，才啟動 App
+            init(); 
         });
     </script>
 </body></html>
