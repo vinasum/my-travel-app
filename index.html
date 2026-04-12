@@ -14,19 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 離線提示預設隱藏 */
-        #offline-notice { display: none; }
-
-        /* 當 body 處於離線狀態時的連動封印 */
-        body.is-offline #offline-notice { display: block !important; }
-
-        /* 物理性鎖死：禁止點擊、變灰、禁用滑鼠 (針對整個主區域) */
-        body.is-offline main {
-            filter: grayscale(1);
-            pointer-events: none !important;
-            user-select: none;
-            opacity: 0.6;
-        }
         :root { --n-gold: #E6B422; --n-wago: #1A2A3A; }
         
         body { 
@@ -98,9 +85,8 @@
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
-<div id="offline-notice" class="bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
-        <i class="fa-solid fa-wifi-slash mr-2"></i>目前無網路，資料為前次紀錄。
-    </div>    
+    <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
+    
     <header class="pt-10 pb-6 flex justify-between items-center">
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-black text-white title-glow">名古屋旅程</h1>
@@ -211,29 +197,21 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-function init() { 
-            // 啟動即偵測：不靠監聽，第一毫秒就判定網路狀態
-            if (!navigator.onLine) {
-                document.body.classList.add('is-offline');
-            }
-
+        function init() { 
+// 偵測網址是否有 ?mode=view
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('mode') === 'view') {
                 document.body.classList.add('mode-view');
                 toast("👓 進入唯讀觀賞模式");
             }
 
+            // ... 後續原本的代碼 ...
             const local = localStorage.getItem(DB_KEY); 
             if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
-            
             document.getElementById('exRate').value = db.rate || 0.21;
             renderAll(); 
-
-            // 只有判定在線，才執行雲端同步
-            if (navigator.onLine) {
-                pullData();
-            }
         }
+
 function renderAll() {
             // 1. 動態取得今天日期，確保手機端能正確顯示「過去行程」的灰階效果
             const todayStr = new Date().toISOString().split('T')[0];
@@ -390,32 +368,32 @@ async function pushData() {
     } catch(e) { console.error(e); }
     showSync(false);
 }
-async function pullData() {
-            showSync(true);
-            try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
-                const cloudData = await res.json();
-                
-                if (cloudData) {
-                    const localBring = db.checkBring;
-                    const localBuy = db.checkBuy;
-                    db = Object.assign({}, masterData, cloudData);
-                    db.checkBring = localBring;
-                    db.checkBuy = localBuy;
-                    localStorage.setItem(DB_KEY, JSON.stringify(db));
-                    renderAll();
-                    
-                    // 同步成功：解除鎖定標籤
-                    document.body.classList.remove('is-offline');
-                    toast("🏮 同步成功 (清單維持本地)");
-                }
-            } catch (e) {
-                // 連線失敗 (含斷網)：立刻貼上標籤，觸發 CSS 物理鎖定
-                document.body.classList.add('is-offline');
-            }
-            showSync(false);
+        async function pullData() {
+    showSync(true);
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL);
+        const cloudData = await res.json();
+        
+        if(cloudData) {
+            // 先備份本地的清單
+            const localBring = db.checkBring;
+            const localBuy = db.checkBuy;
+
+            // 讀取雲端資料
+            db = Object.assign({}, masterData, cloudData);
+
+            // 把本地備份的清單填回去，防止被雲端覆蓋
+            db.checkBring = localBring;
+            db.checkBuy = localBuy;
+
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            renderAll();
+            toast("🏮 同步成功 (清單維持本地)");
         }
-                function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
+    } catch (e) {}
+    showSync(false);
+}
+        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
 // 註冊 Service Worker 讓 Chrome 認可這是個 App
