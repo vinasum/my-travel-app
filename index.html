@@ -215,33 +215,32 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
 function init() { 
-    // --- 第二步：啟動即偵測 (Static Check) ---
-    // 這不是監聽，是網頁一開啟就「查戶口」
-    if (!navigator.onLine) {
-        // 1. 設定刷新後的專用提示文字（與監聽器的文字做出區隔）
+    // 定義設定離線狀態的專用方法
+    const setOfflineUI = () => {
         const msgEl = document.getElementById('offline-msg');
         if (msgEl) msgEl.innerText = "🏮 離線模式：目前正在瀏覽快取版本";
-        // 2. 貼上標籤觸發 CSS 物理鎖定
         document.body.classList.add('is-offline');
+    };
+
+    // 啟動即偵測 (Static Check)
+    if (!navigator.onLine) {
+        setOfflineUI();
     }
 
-    // 處理唯讀模式參數
+    // ... 處理模式與讀取快取 (v11.9 原有邏輯) ...
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'view') {
         document.body.classList.add('mode-view');
         toast("👓 進入唯讀觀賞模式");
     }
-
-    // 讀取本地快取
     const local = localStorage.getItem(DB_KEY); 
     if (local) { db = Object.assign({}, masterData, JSON.parse(local)); }
-    
     document.getElementById('exRate').value = db.rate || 0.21;
     renderAll(); 
 
-    // 只有判定在線，才執行雲端同步
+    // 只有判定在線才同步，若失敗則補強偵測
     if (navigator.onLine) {
-        pullData();
+        pullData(setOfflineUI); // 傳入 UI 設定方法
     }
 }
 function renderAll() {
@@ -400,29 +399,29 @@ async function pushData() {
     } catch(e) { console.error(e); }
     showSync(false);
 }
-        async function pullData() {
+async function pullData(onFailCallback) {
     showSync(true);
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const cloudData = await res.json();
         
         if(cloudData) {
-            // 先備份本地的清單
+            // ... 同步邏輯 (v11.9 原有代碼) ...
             const localBring = db.checkBring;
             const localBuy = db.checkBuy;
-
-            // 讀取雲端資料
             db = Object.assign({}, masterData, cloudData);
-
-            // 把本地備份的清單填回去，防止被雲端覆蓋
             db.checkBring = localBring;
             db.checkBuy = localBuy;
-
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             renderAll();
+            
+            document.body.classList.remove('is-offline'); // 成功則確保解除鎖定
             toast("🏮 同步成功 (清單維持本地)");
         }
-    } catch (e) {}
+    } catch (e) {
+        // 如果 fetch 失敗，代表真的斷網了，執行刷新後的 UI 鎖定
+        if (onFailCallback) onFailCallback();
+    }
     showSync(false);
 }
         function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
