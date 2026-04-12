@@ -14,15 +14,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 離線鎖定樣式 */
-        body.is-offline input, 
-        body.is-offline select, 
-        body.is-offline button.muji-btn,
-        body.is-offline button[onclick*="add"] {
+/* 預設隱藏離線提示 */
+    #offline-notice { display: none; }
+
+    /* 當 body 有 is-offline 類別時，顯示提示並鎖定按鈕 */
+    body.is-offline #offline-notice { display: block !important; }
+    body.is-offline input, 
+    body.is-offline select, 
+    body.is-offline button.muji-btn,
+    body.is-offline button[onclick*="add"] {
         filter: grayscale(1);
         pointer-events: none !important;
         opacity: 0.6;
-        }
+    }
         :root { --n-gold: #E6B422; --n-wago: #1A2A3A; }
         
         body { 
@@ -94,9 +98,10 @@
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
-    <div id="offline-notice" class="hidden bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
+    <div id="offline-notice" class="bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
         <i class="fa-solid fa-wifi-slash mr-2"></i>目前無網路，資料為前次紀錄。
-    </div>    <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
+    </div>
+            <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
     <header class="pt-10 pb-6 flex justify-between items-center">
         <div class="flex items-center gap-3">
@@ -221,11 +226,11 @@ function init() {
     document.getElementById('exRate').value = db.rate || 0.21;
     renderAll(); 
 
-    // 核心偵測：若斷網刷新，立刻掛紅條
+    // 啟動與刷新時的關鍵判定
     if (!navigator.onLine) {
-        document.getElementById('offline-notice').classList.remove('hidden');
         document.body.classList.add('is-offline');
     } else {
+        document.body.classList.remove('is-offline');
         pullData();
     }
 }
@@ -399,18 +404,18 @@ async function pullData() {
             localStorage.setItem(DB_KEY, JSON.stringify(db));
             renderAll();
             
-            // 同步成功：隱藏警告
-            document.getElementById('offline-notice').classList.add('hidden');
+            // 同步成功：確保離線標籤被移除
             document.body.classList.remove('is-offline');
             toast("🏮 同步成功");
         }
     } catch (e) {
-        // 同步失敗（斷網）：釘上警告
-        document.getElementById('offline-notice').classList.remove('hidden');
+        // 同步失敗：強制貼上離線標籤，CSS 會自動讓紅條顯現
         document.body.classList.add('is-offline');
     }
     showSync(false);
-}        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
+}
+
+        function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 3000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
 // 註冊 Service Worker 讓 Chrome 認可這是個 App
