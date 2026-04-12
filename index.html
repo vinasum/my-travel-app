@@ -97,6 +97,11 @@
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
+        <div id="offline-notice" class="absolute -bottom-2 left-0 w-full text-center text-[10px] text-red-400/80 font-bold tracking-widest hidden">
+            <i class="fa-solid fa-wifi-slash mr-1"></i>目前無網路，資料為前次紀錄。
+        </div>
+
+
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
 <header class="pt-10 pb-6 flex justify-between items-center relative">
@@ -109,9 +114,6 @@
             <i class="fa-solid fa-arrows-rotate"></i>
         </button>
 
-        <div id="offline-notice" class="absolute -bottom-2 left-0 w-full text-center text-[10px] text-red-400/80 font-bold tracking-widest hidden">
-            <i class="fa-solid fa-wifi-slash mr-1"></i>目前無網路，資料為上次紀錄
-        </div>
     </header>
 
     <main>
