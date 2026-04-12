@@ -14,6 +14,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* 預設隱藏紅條 */
+        #offline-notice { display: none; }
+
+        /* 當 body 有 is-offline 類別時的連動 */
+        body.is-offline #offline-notice { display: block !important; }
+
+        /* 鎖死 main 區域：禁止所有點擊行為 */
+        body.is-offline main {
+            filter: grayscale(1);
+            pointer-events: none !important;
+            opacity: 0.6;
+            user-select: none;
+        }
         :root { --n-gold: #E6B422; --n-wago: #1A2A3A; }
         
         body { 
@@ -82,9 +95,25 @@
         .mode-view #viewDelBtn {
             display: none !important;
         }
+    // --- 監聽模式：處理刷新前的即時斷網事件 ---
+    window.addEventListener('offline', () => {
+        // 1. 設定刷新前的提示文字
+        document.getElementById('offline-msg').innerText = "⚠️ 網路連線已中斷，目前操作將無法同步";
+        // 2. 貼上標籤觸發 CSS 鎖定
+        document.body.classList.add('is-offline');
+    });
+
+    window.addEventListener('online', () => {
+        // 恢復連線時自動解鎖
+        document.body.classList.remove('is-offline');
+    });
     </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
+    <div id="offline-notice" class="bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
+    <i class="fa-solid fa-wifi-slash mr-2"></i>
+    <span id="offline-msg">⚠️ 網路連線已中斷，目前操作將無法同步</span>
+    </div>
     <div id="syncBar" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--n-gold); z-index: 9999; transform: scaleX(0); transition: 0.4s; transform-origin: left;"></div>
     
     <header class="pt-10 pb-6 flex justify-between items-center">
