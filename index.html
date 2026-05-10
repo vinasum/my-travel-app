@@ -88,14 +88,14 @@
         .mode-view button[onclick*="open"], 
         .mode-view button[onclick*="addItem"],
         .mode-view button[onclick*="addExp"],
-        .mode-view .fa-arrows-rotate, /* 隱藏同步按鈕 */
+        .mode-view .fa-arrows-rotate, 
         .mode-view input, 
         .mode-view select,
         .mode-view #viewEditBtn,
-        .mode-view #viewDelBtn {
+        .mode-view #viewDelBtn,
+        .mode-view .del-btn { /* 新增這一行 */
             display: none !important;
-        }
-    </style>
+        }    </style>
 </head>
 <body class="max-w-md mx-auto relative px-5">
     <div id="offline-notice" class="bg-red-600 text-white text-center py-2 text-xs font-bold tracking-widest sticky top-0 left-0 w-full z-[9999] shadow-lg">
@@ -293,20 +293,24 @@ function init() {
             renderCheckList('bring', db.checkBring, 'bringList'); 
             renderCheckList('buy', db.checkBuy, 'buyList');
 
-            // 5. 渲染記帳統計
+// 5. 渲染記帳統計
             const rate = db.rate || 0.21; 
             let total = 0; 
             const ps = {}; 
             (db.payers||[]).forEach(p => ps[p] = 0);
 
             document.getElementById('expList').innerHTML = (db.expenses||[]).slice().reverse().map((e, i) => { 
+                // 因為顯示是反過來的，所以要計算出它在原始陣列中的 index
+                const originalIdx = db.expenses.length - 1 - i;
                 total += e.cost; ps[e.payer] += e.cost; 
                 return `<div class="glass-card p-4 flex justify-between items-center text-gray-800">
                             <div><p class="font-black">${e.name}</p><p class="opacity-50 text-[14px]">${Math.round(e.cost * rate)} TWD • ${e.payer}</p></div>
-                            <span class="font-black text-xl">¥${e.cost.toLocaleString()}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="font-black text-xl">¥${e.cost.toLocaleString()}</span>
+                                <button onclick="delExpItem(${originalIdx})" class="text-red-400 p-2 del-btn"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                         </div>`; 
-            }).join('');
-            
+            }).join('');            
             document.getElementById('totalSpend').innerText = total.toLocaleString(); 
             document.getElementById('totalTWD').innerText = Math.round(total * rate).toLocaleString();
 
@@ -421,7 +425,7 @@ async function pullData(onFailCallback) {
             
             // 同步成功：確保解除鎖定
             document.body.classList.remove('is-offline');
-            toast("🏮 同步成功 (清單維持本地)");
+            toast("🏮 同步成功 ");
         }
     } catch (e) {
         // 只要 fetch 失敗或是 5 秒到了（超時），立刻觸發刷新後的離線提示
@@ -433,6 +437,12 @@ async function pullData(onFailCallback) {
         function resetToDefault() { if(confirm("確定重置數據？")) { localStorage.clear(); location.reload(); } }
         function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 5000); }
         function showSync(s) { document.getElementById('syncBar').style.transform = s ? 'scaleX(1)' : 'scaleX(0)'; }
+        function delExpItem(idx) {
+            if (confirm("確定要刪除這筆支出紀錄嗎？")) {
+                db.expenses.splice(idx, 1);
+                pushData(); // 儲存至本地並同步至雲端
+            }
+        }
 // 註冊 Service Worker 讓 Chrome 認可這是個 App
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(() => {
